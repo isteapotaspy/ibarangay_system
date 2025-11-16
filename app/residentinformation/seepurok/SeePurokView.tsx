@@ -20,52 +20,52 @@ export default function SeePuroksView() {
   const PUROK_COLORS = ["#4f46e5", "#2563eb", "#f97316", "#16a34a", "#db2777", "#facc15"];
   const RES_TEN_COLORS = ["#2563eb", "#f97316"]; // Residents = blue, Tenants = orange
 
-  useEffect(() => {
-    async function fetchPuroks() {
-      const snapshot = await getDocs(collection(db, "residents"));
-      const map: Record<string, { residents: number; tenants: number }> = {};
+ useEffect(() => {
+  async function fetchPuroks() {
+    const snapshot = await getDocs(collection(db, "residents"));
+    const map: Record<string, { residents: number; tenants: number }> = {};
 
-      snapshot.forEach(doc => {
-        const data = doc.data();
-        const purokName = data.purok || "Unknown";
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      const purokName = data.purok || "Unknown";
 
-        if (!map[purokName]) map[purokName] = { residents: 0, tenants: 0 };
+      if (!map[purokName]) map[purokName] = { residents: 0, tenants: 0 };
 
-        const householdCount = data.householdMembers?.length || 0;
+      const householdCount = data.householdMembers?.length || 0;
 
-        if (data.ownerType === "resident") {
-          // Resident head + household members
-          map[purokName].residents += 1 + householdCount;
-        } else if (data.ownerType === "landlord") {
-          // Owner may live elsewhere but still a resident
-          const ownerIsResident = data.isOwnerResident || false; // owner lives elsewhere but still a resident
-          const ownerLivesHere = data.isOwnerLivingHere || false; // owner lives in this property
+      if (data.ownerType === "resident") {
+        // Resident head + household members
+        map[purokName].residents += 1; // head
+        map[purokName].residents += householdCount; // household members
+      } else if (data.ownerType === "landlord") {
+        // Landlord owner
+        map[purokName].residents += 1; // landlord counts as resident
 
-          if (ownerIsResident) {
-            map[purokName].residents += 1; // owner counts as resident
-          }
-
-          if (ownerLivesHere) {
-            map[purokName].tenants += 1 + householdCount; // owner + household counted as tenants
-          } else {
-            map[purokName].tenants += householdCount; // only tenants counted
-          }
+        if (data.ownerLivesInProperty) {
+          // counts as tenant + household members
+          map[purokName].tenants += 1; // landlord as tenant
+          map[purokName].tenants += householdCount; // household members
+        } else {
+          // only household members are tenants
+          map[purokName].tenants += householdCount;
         }
-      });
+      }
+    });
 
-      const list: Purok[] = Object.entries(map).map(([name, counts]) => ({
-        name,
-        residents: counts.residents,
-        tenants: counts.tenants,
-        total: counts.residents + counts.tenants,
-      }));
+    const list: Purok[] = Object.entries(map).map(([name, counts]) => ({
+      name,
+      residents: counts.residents,
+      tenants: counts.tenants,
+      total: counts.residents + counts.tenants,
+    }));
 
-      setPuroks(list);
-      setTotalPopulation(list.reduce((sum, p) => sum + p.total, 0));
-    }
+    setPuroks(list);
+    setTotalPopulation(list.reduce((sum, p) => sum + p.total, 0));
+  }
 
-    fetchPuroks();
-  }, []);
+  fetchPuroks();
+}, []);
+
 
   const barangayPieData = puroks.map(p => ({ name: p.name, value: p.total }));
   const overallResTenData = [

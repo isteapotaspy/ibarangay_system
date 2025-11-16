@@ -1,4 +1,3 @@
-// app/residentinformation/LandlordForm.tsx
 "use client";
 
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -41,6 +40,7 @@ export default function LandlordForm({
 }: LandlordFormProps) {
   const landlordFields = [
     "Full Legal Name",
+    "Date of Birth",
     "Current Address",
     "Mobile Number",
     "Alternate Contact Number",
@@ -48,6 +48,7 @@ export default function LandlordForm({
     "Proof of Ownership",
     "Emergency Contact Person",
     "Date of Registration",
+    "Lives in this property", // Yes/No
   ];
 
   const propertyFields = [
@@ -71,166 +72,222 @@ export default function LandlordForm({
     "Email Address",
   ];
 
-  const memberFields: (keyof HouseholdMember | string)[] = [
-    "Full Name",
-    "Date of Birth",
-    "Sex/Gender",
-    "Relationship",
-    "Occupation",
-    "School Attending",
-  ];
-
-  const validateInput = (label: string, value: string) => {
-    if (label.toLowerCase().includes("email")) return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-    if (label.toLowerCase().includes("mobile") || label.toLowerCase().includes("contact")) return /^\d*$/.test(value); // allow empty while typing
-    if (label.toLowerCase().includes("date")) return /^\d{0,2}\/?\d{0,2}\/?\d{0,4}$/.test(value);
-    return true;
-  };
+  const onlyDigits = (v: string) => v.replace(/\D/g, "");
 
   return (
     <>
-      <div className="space-y-4">
-        <h3 className="font-semibold">Landlady/Landlord Details</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {landlordFields.map((field) => (
-            <div key={field} className="space-y-2">
-              <Label>{field}</Label>
-              {field === "Sex/Gender" ? (
-                <Select value={landlordInfo[field] || ""} onValueChange={(val) => setLandlordInfo((prev) => ({ ...prev, [field]: val }))}>
-                  <SelectTrigger className="w-full"><SelectValue placeholder="Select" /></SelectTrigger>
+      <Section title="Landlady/Landlord Details">
+        {landlordFields.map((field) => {
+          if (field === "Sex/Gender") {
+            return (
+              <div key={field} className="space-y-2">
+                <Label>{field}</Label>
+                <Select
+                  value={landlordInfo[field] || ""}
+                  onValueChange={(val) => setLandlordInfo((p) => ({ ...p, [field]: val }))}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select Gender" />
+                  </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="Male">Male</SelectItem>
                     <SelectItem value="Female">Female</SelectItem>
                   </SelectContent>
                 </Select>
-              ) : (
-                <Input
-                  placeholder={field}
-                  value={landlordInfo[field] || ""}
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    if (validateInput(field, val)) setLandlordInfo((prev) => ({ ...prev, [field]: val }));
-                  }}
-                />
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
+              </div>
+            );
+          }
 
-      <div className="space-y-4">
-        <h3 className="font-semibold">Property Details</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {propertyFields.map((field) => (
-            <div key={field} className="space-y-2">
-              <Label>{field}</Label>
-              <Input placeholder={field} value={propertyDetails[field] || ""} onChange={(e) => setPropertyDetails((prev) => ({ ...prev, [field]: e.target.value }))} />
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="space-y-4">
-        <h3 className="font-semibold">Tenant Details</h3>
-        <ScrollArea className="h-64 rounded-md border p-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {tenantFields.map((field) => (
+          if (field === "Lives in this property") {
+            return (
               <div key={field} className="space-y-2">
                 <Label>{field}</Label>
-                {field === "Sex/Gender" ? (
-                  <Select value={tenantInfo["Sex/Gender"] || ""} onValueChange={(val) => setTenantInfo((prev) => ({ ...prev, "Sex/Gender": val }))}>
-                    <SelectTrigger className="w-full"><SelectValue placeholder="Select Gender" /></SelectTrigger>
+                <Select
+                  value={landlordInfo[field] || ""}
+                  onValueChange={(val) => setLandlordInfo((p) => ({ ...p, [field]: val }))}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Yes">Yes</SelectItem>
+                    <SelectItem value="No">No</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            );
+          }
+
+          if (field === "Date of Birth" || field === "Date of Registration") {
+            return (
+              <div key={field} className="space-y-2">
+                <Label>{field}</Label>
+                <Input
+                  type="date"
+                  value={landlordInfo[field] || ""}
+                  onChange={(e) => setLandlordInfo((p) => ({ ...p, [field]: e.target.value }))}
+                />
+              </div>
+            );
+          }
+
+          if (field === "Mobile Number" || field === "Alternate Contact Number") {
+            return (
+              <div key={field} className="space-y-2">
+                <Label>{field}</Label>
+                <Input
+                  value={landlordInfo[field] || ""}
+                  onChange={(e) => setLandlordInfo((p) => ({ ...p, [field]: onlyDigits(e.target.value) }))}
+                />
+              </div>
+            );
+          }
+
+          if (field === "Email Address") {
+            return (
+              <div key={field} className="space-y-2">
+                <Label>{field}</Label>
+                <Input
+                  type="email"
+                  value={landlordInfo[field] || ""}
+                  onChange={(e) => setLandlordInfo((p) => ({ ...p, [field]: e.target.value }))}
+                />
+              </div>
+            );
+          }
+
+          return (
+            <InputField
+              key={field}
+              label={field}
+              value={landlordInfo[field] || ""}
+              onChange={(val: string) => setLandlordInfo((p) => ({ ...p, [field]: val }))}
+            />
+          );
+        })}
+      </Section>
+
+      <Section title="Property Details">
+        {propertyFields.map((field) => (
+          <InputField key={field} label={field} value={propertyDetails[field] || ""} onChange={(val) => setPropertyDetails((p) => ({ ...p, [field]: val }))} />
+        ))}
+      </Section>
+
+      <Section title="Tenant Details">
+        <ScrollArea className="h-64 rounded-md border p-4">
+          {tenantFields.map((field) => {
+            if (field === "Sex/Gender") {
+              return (
+                <div key={field} className="space-y-2">
+                  <Label>{field}</Label>
+                  <Select value={tenantInfo["Sex/Gender"] || ""} onValueChange={(val) => setTenantInfo((p) => ({ ...p, "Sex/Gender": val }))}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select Gender" />
+                    </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="Male">Male</SelectItem>
                       <SelectItem value="Female">Female</SelectItem>
                     </SelectContent>
                   </Select>
-                ) : field === "Date of Birth" ? (
-                  <Input placeholder="DD/MM/YYYY" value={tenantInfo[field] || ""} onChange={(e) => {
-                    const val = e.target.value;
-                    if (/^\d{0,2}\/?\d{0,2}\/?\d{0,4}$/.test(val)) setTenantInfo((prev) => ({ ...prev, [field]: val }));
-                  }} />
-                ) : (
-                  <Input placeholder={field} value={tenantInfo[field] || ""} onChange={(e) => {
-                    const val = e.target.value;
-                    if (validateInput(field, val)) setTenantInfo((prev) => ({ ...prev, [field]: val }));
-                  }} />
-                )}
-              </div>
-            ))}
-          </div>
-        </ScrollArea>
-      </div>
+                </div>
+              );
+            }
 
-      <div className="space-y-4">
-        <h3 className="font-semibold">Household Members</h3>
+            if (field === "Date of Birth") {
+              return (
+                <div key={field} className="space-y-2">
+                  <Label>{field}</Label>
+                  <Input type="date" value={tenantInfo[field] || ""} onChange={(e) => setTenantInfo((p) => ({ ...p, [field]: e.target.value }))} />
+                </div>
+              );
+            }
+
+            if (field === "Mobile Number") {
+              return (
+                <div key={field} className="space-y-2">
+                  <Label>{field}</Label>
+                  <Input value={tenantInfo[field] || ""} onChange={(e) => setTenantInfo((p) => ({ ...p, [field]: e.target.value.replace(/\D/g, "") }))} />
+                </div>
+              );
+            }
+
+            return <InputField key={field} label={field} value={tenantInfo[field] || ""} onChange={(val) => setTenantInfo((p) => ({ ...p, [field]: val }))} />;
+          })}
+        </ScrollArea>
+      </Section>
+
+      <Section title="Household Members">
         <ScrollArea className="h-64 rounded-md border p-4">
           {householdMembers.map((m, i) => (
             <div key={i} className="flex flex-col mb-4 space-y-2">
               <span className="font-semibold">#{i + 1}</span>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {memberFields.map((field) => {
-                  if (field === "Sex/Gender") {
-                    return (
-                      <div key={String(field)} className="space-y-2">
-                        <Label>{String(field)}</Label>
-                        <Select value={m.gender || ""} onValueChange={(val) => updateMember(setHouseholdMembers, householdMembers, i, "gender", val)}>
-                          <SelectTrigger className="w-full"><SelectValue placeholder="Select Gender" /></SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="Male">Male</SelectItem>
-                            <SelectItem value="Female">Female</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    );
-                  }
 
-                  if (field === "Date of Birth") {
-                    return (
-                      <div key={String(field)} className="space-y-2">
-                        <Label>{String(field)}</Label>
-                        <Input placeholder="DD/MM/YYYY" value={m.dob} onChange={(e) => {
-                          const val = e.target.value;
-                          if (/^\d{0,2}\/?\d{0,2}\/?\d{0,4}$/.test(val)) updateMember(setHouseholdMembers, householdMembers, i, "dob", val);
-                        }} />
-                      </div>
-                    );
-                  }
+              <InputField
+                label="Full Name"
+                value={m.name}
+                onChange={(val) => updateMember(setHouseholdMembers, householdMembers, i, "name", val)}
+              />
 
-                  const value =
-                    field === "Full Name"
-                      ? m.name
-                      : field === "Relationship"
-                      ? m.relationship
-                      : field === "Occupation"
-                      ? m.occupation || ""
-                      : m.school || "";
-
-                  return (
-                    <div key={String(field)} className="space-y-2">
-                      <Label>{String(field)}</Label>
-                      <Input placeholder={String(field)} value={value} onChange={(e) => {
-                        const val = e.target.value;
-                        const key: keyof HouseholdMember =
-                          field === "Full Name"
-                            ? "name"
-                            : field === "Relationship"
-                            ? "relationship"
-                            : field === "Occupation"
-                            ? "occupation"
-                            : "school";
-                        updateMember(setHouseholdMembers, householdMembers, i, key, val);
-                      }} />
-                    </div>
-                  );
-                })}
+              <div className="space-y-2">
+                <Label>Date of Birth</Label>
+                <Input type="date" value={m.dob || ""} onChange={(e) => updateMember(setHouseholdMembers, householdMembers, i, "dob", e.target.value)} />
               </div>
+
+              <div className="space-y-2">
+                <Label>Sex/Gender</Label>
+                <Select value={m.gender || ""} onValueChange={(val) => updateMember(setHouseholdMembers, householdMembers, i, "gender", val)}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select Gender" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Male">Male</SelectItem>
+                    <SelectItem value="Female">Female</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <InputField label="Relationship" value={m.relationship} onChange={(val) => updateMember(setHouseholdMembers, householdMembers, i, "relationship", val)} />
+
+              <div className="space-y-2">
+                <Label>Status</Label>
+                <Select value={m.status || "Not student"} onValueChange={(val) => updateMember(setHouseholdMembers, householdMembers, i, "status", val)}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Student">Student</SelectItem>
+                    <SelectItem value="Employed">Employed</SelectItem>
+                    <SelectItem value="Not student">Not student</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <InputField label="Occupation" value={m.occupation || ""} onChange={(val) => updateMember(setHouseholdMembers, householdMembers, i, "occupation", val)} />
+              <InputField label="School Attending" value={m.school || ""} onChange={(val) => updateMember(setHouseholdMembers, householdMembers, i, "school", val)} />
             </div>
           ))}
         </ScrollArea>
 
         <Button onClick={() => addHouseholdMember(setHouseholdMembers, householdMembers)}>➕ Add Member</Button>
-      </div>
+      </Section>
     </>
+  );
+}
+
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="space-y-4">
+      <h3 className="font-semibold">{title}</h3>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">{children}</div>
+    </div>
+  );
+}
+
+function InputField({ label, value, onChange }: { label: string; value?: string; onChange: (v: string) => void }) {
+  return (
+    <div className="space-y-2">
+      <Label>{label}</Label>
+      <Input placeholder={label} value={value || ""} onChange={(e) => onChange(e.target.value)} />
+    </div>
   );
 }

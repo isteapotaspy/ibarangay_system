@@ -1,4 +1,3 @@
-// app/residentinformation/Profiling.tsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -13,60 +12,44 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import ResidentForm, { HouseholdMember } from "./ResidentForm";
 import LandlordForm from "./LandlordForm";
 
-type PurokData = {
-  name: string;
-  residents: number;
-  tenants: number;
-  total: number;
-};
-
 export default function Profiling() {
   const [type, setType] = useState<"resident" | "landlord">("resident");
 
-  // Resident state
   const [residentHead, setResidentHead] = useState<Record<string, string>>({});
   const [residentHousehold, setResidentHousehold] = useState<HouseholdMember[]>([
-    { name: "", dob: "", gender: "", relationship: "", occupation: "", school: "" },
+    { name: "", dob: "", gender: "", relationship: "", occupation: "", status: "Not student", school: "" },
   ]);
 
-  // Landlord state
   const [landlordInfo, setLandlordInfo] = useState<Record<string, string>>({});
   const [propertyDetails, setPropertyDetails] = useState<Record<string, string>>({});
   const [tenantInfo, setTenantInfo] = useState<Record<string, string>>({});
   const [householdMembersLandlord, setHouseholdMembersLandlord] = useState<HouseholdMember[]>([
-    { name: "", dob: "", gender: "", relationship: "", occupation: "", school: "" },
+    { name: "", dob: "", gender: "", relationship: "", occupation: "", status: "Not student", school: "" },
   ]);
 
-  // QR + purok
   const [qrValue, setQrValue] = useState<string>("");
   const [availablePuroks, setAvailablePuroks] = useState<string[]>([]);
   const [purokInput, setPurokInput] = useState<string>("");
   const [addingPurok, setAddingPurok] = useState<boolean>(false);
 
-  // fetch puroks list
   useEffect(() => {
     async function fetchPuroks() {
-      try {
-        const snapshot = await getDocs(collection(db, "residents"));
-        const setMap: Record<string, boolean> = {};
-        snapshot.forEach((doc) => {
-          const d = doc.data();
-          const name = d?.purok || "Unknown";
-          setMap[name] = true;
-        });
-        setAvailablePuroks(Object.keys(setMap));
-      } catch (err) {
-        console.error("fetch puroks error", err);
-      }
+      const snapshot = await getDocs(collection(db, "residents"));
+      const setNames: Record<string, boolean> = {};
+      snapshot.forEach((d) => {
+        const data = d.data();
+        const name = data.purok || "Unknown";
+        setNames[name] = true;
+      });
+      setAvailablePuroks(Object.keys(setNames));
     }
     fetchPuroks();
   }, []);
 
   const handleAddNewPurok = (value: string) => {
-    if (value && !availablePuroks.includes(value)) {
-      setAvailablePuroks((prev) => [...prev, value]);
-      setPurokInput(value);
-    }
+    if (!value) return;
+    if (!availablePuroks.includes(value)) setAvailablePuroks((s) => [...s, value]);
+    setPurokInput(value);
     setAddingPurok(false);
   };
 
@@ -74,10 +57,9 @@ export default function Profiling() {
     setter: React.Dispatch<React.SetStateAction<HouseholdMember[]>>,
     list: HouseholdMember[]
   ) => {
-    setter((prev) => [...prev, { name: "", dob: "", gender: "", relationship: "", occupation: "", school: "" }]);
+    setter([...list, { name: "", dob: "", gender: "", relationship: "", occupation: "", status: "Not student", school: "" }]);
   };
 
-  // safer updateMember using immutable pattern
   const updateMember = (
     setter: React.Dispatch<React.SetStateAction<HouseholdMember[]>>,
     list: HouseholdMember[],
@@ -86,82 +68,101 @@ export default function Profiling() {
     value: string
   ) => {
     setter((prev) => {
-      if (i < 0 || i >= prev.length) return prev;
-      const copy = prev.map((it) => ({ ...it }));
-      copy[i] = { ...copy[i], [field]: value };
+      const copy = [...prev];
+      const defaults: HouseholdMember = { name: "", dob: "", gender: "", relationship: "", occupation: "", status: "Not student", school: "" };
+      const member = copy[i] ? { ...copy[i] } : { ...defaults };
+      member[field] = value;
+      copy[i] = member;
       return copy;
     });
   };
 
   const validateEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  const validatePhone = (phone: string) => /^\d+$/.test(phone);
-  const validateDOB = (dob: string) => /^\d{2}\/\d{2}\/\d{4}$/.test(dob); // DD/MM/YYYY
+  const validatePhone = (phone: string) => phone === "" || /^\d+$/.test(phone);
+  const validateDOB = (dob: string) => /^\d{4}-\d{2}-\d{2}$/.test(dob);
 
   const saveForm = async () => {
-    if (!purokInput) return alert("Please select a Purok.");
-
     const idValue = `${type}-${Date.now()}`;
     setQrValue(idValue);
 
-    // Basic validations
+    if (!purokInput) return alert("Please select a Purok.");
+
     if (type === "resident") {
-      if (!residentHead["Full Legal Name"] || !residentHead["Mobile Number"] || !residentHead["Email Address"] || !residentHead["Sex/Gender"] || !residentHead["Date of Birth"]) {
-        return alert("Please fill all required fields for the head of household.");
-      }
-      if (!validateEmail(residentHead["Email Address"])) return alert("Invalid email format.");
-      if (!validatePhone(residentHead["Mobile Number"])) return alert("Contact number must be numeric.");
-      if (!["Male","Female"].includes(residentHead["Sex/Gender"])) return alert("Gender must be Male or Female.");
-      if (!validateDOB(residentHead["Date of Birth"])) return alert("Date of Birth must be DD/MM/YYYY.");
+      if (!residentHead["Full Legal Name"]) return alert("Please fill Full Legal Name for head.");
+      if (!residentHead["Date of Birth"] || !validateDOB(residentHead["Date of Birth"])) return alert("Head Date of Birth required (YYYY-MM-DD).");
+      if (!residentHead["Sex/Gender"] || !["Male", "Female"].includes(residentHead["Sex/Gender"])) return alert("Head Sex/Gender required.");
+      if (residentHead["Email Address"] && !validateEmail(residentHead["Email Address"])) return alert("Head email is invalid.");
+      if (residentHead["Mobile Number"] && !validatePhone(residentHead["Mobile Number"])) return alert("Head mobile must be numbers only.");
 
       for (const m of residentHousehold) {
-        if (!m.name || !m.gender || !m.dob) return alert("Each household member must have name, gender and DOB.");
-        if (!validateDOB(m.dob)) return alert("Household member DOB must be DD/MM/YYYY.");
-        if (!["Male","Female"].includes(m.gender)) return alert("Household member gender must be Male or Female.");
+        if (!m.name) return alert("Each household member must have a name.");
+        if (!m.dob || !validateDOB(m.dob)) return alert("Each member DOB must be YYYY-MM-DD.");
+        if (!m.gender || !["Male", "Female"].includes(m.gender)) return alert("Each member Sex/Gender must be Male or Female.");
       }
     } else {
-      if (!landlordInfo["Full Legal Name"] || !landlordInfo["Mobile Number"] || !landlordInfo["Email Address"]) {
-        return alert("Please fill all required fields for the landlord.");
-      }
-      if (!validateEmail(landlordInfo["Email Address"])) return alert("Invalid email format.");
-      if (!validatePhone(landlordInfo["Mobile Number"])) return alert("Contact number must be numeric.");
-      // landlord household members:
+      if (!landlordInfo["Full Legal Name"]) return alert("Please fill Full Legal Name for landlord.");
+      if (!landlordInfo["Date of Birth"] || !validateDOB(landlordInfo["Date of Birth"])) return alert("Landlord DOB required (YYYY-MM-DD).");
+      if (!landlordInfo["Lives in this property"]) return alert("Please indicate if the landlord lives in this property.");
+      if (landlordInfo["Email Address"] && !validateEmail(landlordInfo["Email Address"])) return alert("Landlord email is invalid.");
+      if (landlordInfo["Mobile Number"] && !validatePhone(landlordInfo["Mobile Number"])) return alert("Landlord mobile must be numbers only.");
+
       for (const m of householdMembersLandlord) {
-        if (!m.name || !m.gender || !m.dob) return alert("Each household member must have name, gender and DOB.");
-        if (!validateDOB(m.dob)) return alert("Household member DOB must be DD/MM/YYYY.");
-        if (!["Male","Female"].includes(m.gender)) return alert("Household member gender must be Male or Female.");
+        if (!m.name) return alert("Each household member must have a name.");
+        if (!m.dob || !validateDOB(m.dob)) return alert("Each member DOB must be YYYY-MM-DD.");
+        if (!m.gender || !["Male", "Female"].includes(m.gender)) return alert("Each member Sex/Gender must be Male or Female.");
       }
     }
 
-    // Build payload
-    let payload: any = {
+    const payloadBase: any = {
       ownerType: type,
       purok: purokInput,
       qrCode: idValue,
       createdAt: serverTimestamp(),
     };
 
+    let payload = payloadBase;
     if (type === "resident") {
-      payload = { ...payload, headOfHousehold: residentHead, householdMembers: residentHousehold };
+      payload = {
+        ...payloadBase,
+        headOfHousehold: residentHead,
+        householdMembers: residentHousehold,
+        counts: {
+          head: 1,
+          household: residentHousehold.length,
+          totalPersons: 1 + residentHousehold.length,
+        },
+      };
     } else {
-      payload = { ...payload, landlordInfo, propertyDetails, tenantInfo, householdMembers: householdMembersLandlord };
-      payload.isOwnerLivingHere = landlordInfo["Lives in this property"] === "Yes";
+      payload = {
+        ...payloadBase,
+        landlordInfo,
+        propertyDetails,
+        tenantInfo,
+        householdMembers: householdMembersLandlord,
+        counts: {
+          landlord: 1,
+          household: householdMembersLandlord.length,
+          totalPersons: 1 + householdMembersLandlord.length,
+        },
+        ownerLivesInProperty: landlordInfo["Lives in this property"] === "Yes",
+      };
     }
 
     try {
       await addDoc(collection(db, "residents"), payload);
-      alert("Saved.");
-      // reset
+      alert("Saved successfully!");
+
       setPurokInput("");
       setResidentHead({});
-      setResidentHousehold([{ name: "", dob: "", gender: "", relationship: "", occupation: "", school: "" }]);
+      setResidentHousehold([{ name: "", dob: "", gender: "", relationship: "", occupation: "", status: "Not student", school: "" }]);
       setLandlordInfo({});
       setPropertyDetails({});
       setTenantInfo({});
-      setHouseholdMembersLandlord([{ name: "", dob: "", gender: "", relationship: "", occupation: "", school: "" }]);
+      setHouseholdMembersLandlord([{ name: "", dob: "", gender: "", relationship: "", occupation: "", status: "Not student", school: "" }]);
       setQrValue("");
     } catch (err) {
       console.error(err);
-      alert("Save failed");
+      alert("Failed to save. See console.");
     }
   };
 
@@ -172,25 +173,36 @@ export default function Profiling() {
       </CardHeader>
 
       <CardContent className="space-y-6">
-        {/* Toggle */}
         <div className="flex gap-4">
-          <Button variant={type === "resident" ? "default" : "outline"} onClick={() => setType("resident")}>Old Resident</Button>
-          <Button variant={type === "landlord" ? "default" : "outline"} onClick={() => setType("landlord")}>Landlady/Landlord</Button>
+          <Button variant={type === "resident" ? "default" : "outline"} onClick={() => setType("resident")}>
+            Old Resident
+          </Button>
+          <Button variant={type === "landlord" ? "default" : "outline"} onClick={() => setType("landlord")}>
+            Landlady/Landlord
+          </Button>
         </div>
 
-        {/* Purok select */}
         <div className="space-y-2">
           <label className="block text-sm font-medium text-gray-700">Purok</label>
-          <Select value={purokInput} onValueChange={setPurokInput}>
-            <SelectTrigger className="w-full"><SelectValue placeholder="Select Purok" /></SelectTrigger>
+          <Select onValueChange={setPurokInput} value={purokInput}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select Purok" />
+            </SelectTrigger>
             <SelectContent>
-              {availablePuroks.map((p) => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+              {availablePuroks.map((p) => (
+                <SelectItem key={p} value={p}>{p}</SelectItem>
+              ))}
             </SelectContent>
           </Select>
 
           {addingPurok ? (
             <div className="flex gap-2 mt-2">
-              <input value={purokInput} onChange={(e) => setPurokInput(e.target.value)} className="border rounded px-2 py-1 flex-1" placeholder="New Purok" />
+              <input
+                value={purokInput}
+                onChange={(e) => setPurokInput(e.target.value)}
+                className="border rounded px-2 py-1 flex-1"
+                placeholder="New Purok"
+              />
               <Button onClick={() => handleAddNewPurok(purokInput)}>✔</Button>
               <Button variant="outline" onClick={() => setAddingPurok(false)}>✖</Button>
             </div>
