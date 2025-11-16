@@ -1,0 +1,64 @@
+type Barangay @table {
+  name: String!
+  city: String!
+  province: String!
+  contactNumber: String
+  email: String
+  description: String
+}
+
+type User @table {
+  displayName: String!
+  userType: String!
+  barangay: Barangay!
+  email: String
+  phoneNumber: String
+  address: String
+  photoUrl: String
+}
+
+type Announcement @table {
+  title: String!
+  content: String!
+  createdAt: Timestamp!
+  publishDate: Date!
+  barangay: Barangay!
+  creator: User!
+  expiryDate: Date
+  isUrgent: Boolean
+}
+
+type Event @table {
+  title: String!
+  description: String!
+  eventDate: Timestamp!
+  location: String!
+  createdAt: Timestamp!
+  barangay: Barangay!
+  creator: User!
+  isPublic: Boolean
+  rsvpRequired: Boolean
+}
+
+type ServiceRequest @table {
+  subject: String!
+  description: String!
+  status: String!
+  createdAt: Timestamp!
+  requester: User!
+  barangay: Barangay!
+  assignedTo: User
+  resolutionNotes: String
+}
+
+type DocumentRequest @table {
+  documentType: String!
+  purpose: String!
+  status: String!
+  createdAt: Timestamp!
+  requester: User!
+  barangay: Barangay!
+  pickupDate: Timestamp
+  notes: String
+  officialRemarks: String
+}
