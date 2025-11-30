@@ -1,0 +1,4 @@
+.viewButtonGroup {
+    display: flex;
+    flex-direction: column;
+}
