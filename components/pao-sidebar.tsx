@@ -35,7 +35,7 @@ export function PaoSidebar() {
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupContent>
-            <SidebarGroupLabel>Application</SidebarGroupLabel>
+            <SidebarGroupLabel>PEACE AND ORDER</SidebarGroupLabel>
               <SidebarMenu> 
                 {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
