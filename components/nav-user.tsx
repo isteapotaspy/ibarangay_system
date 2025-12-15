@@ -94,20 +94,6 @@ export function NavUser({
             </DropdownMenuLabel>
 
             <DropdownMenuSeparator />
-
-            <DropdownMenuGroup>
-              <DropdownMenuItem className="flex items-center gap-2">
-                <BadgeCheck /> Account
-              </DropdownMenuItem>
-              <DropdownMenuItem className="flex items-center gap-2">
-                <CreditCard /> Billing
-              </DropdownMenuItem>
-              <DropdownMenuItem className="flex items-center gap-2">
-                <Bell /> Notifications
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-
-            <DropdownMenuSeparator />
             {/* THEME TOGGLE */}
             <DropdownMenuGroup>
               <div className="flex items-center space-x-2 px-2 py-1 cursor-default">
