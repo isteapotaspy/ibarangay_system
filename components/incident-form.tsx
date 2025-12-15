@@ -71,23 +71,25 @@ export default function IncidentForm({ incident, onBack, onSave}: IncidentFormPr
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <Button onClick={onBack} variant="outline" className="p-2">
+        <Button onClick={onBack} className="p-2 rounded-lg dark:bg-black dark:text-gray-100 dark:hover:bg-white dark:hover:text-black">
           <ArrowLeft className="w-5 h-5" />
         </Button>
         <div>
-          <h2 className="text-2xl">{incident ? 'Edit Incident' : 'Report New Incident'}</h2>
-          <p className="text-gray-600">Fill in the incident details below</p>
+          <h2 className="text-2xl text-gray-900 dark:text-gray-100">{incident ? 'Edit Incident' : 'Report New Incident'}</h2>
+          <p className="text-gray-600 dark:text-gray-400">Fill in the incident details below</p>
         </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Incident Info */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 space-y-4">
-          <h3 className="text-lg font-semibold">Incident Information</h3>
+        <div className="rounded-lg border shadow-sm p-6
+          bg-white text-gray-800 border-gray-200
+           dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700">
+          <h3 className="text-lg mb-4  font-semibold text-gray-900 dark:text-gray-100">Incident Information</h3>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="dateReported">Date Reported *</Label>
+              <Label htmlFor="dateReported" className="block text-sm text-gray-700 dark:text-gray-300 mb-2">Date Reported *</Label>
               <Input
                 id="dateReported"
                 type="date"
@@ -98,7 +100,7 @@ export default function IncidentForm({ incident, onBack, onSave}: IncidentFormPr
             </div>
 
             <div>
-              <Label htmlFor="timeReported">Time Reported *</Label>
+              <Label htmlFor="timeReported" className="block text-sm text-gray-700 dark:text-gray-300 mb-2">Time Reported *</Label>
               <Input
                 id="timeReported"
                 type="time"
@@ -109,7 +111,7 @@ export default function IncidentForm({ incident, onBack, onSave}: IncidentFormPr
             </div>
 
             <div>
-              <Label htmlFor="type">Incident Type *</Label>
+              <Label htmlFor="type" className="block text-sm text-gray-700 dark:text-gray-300 mb-2">Incident Type *</Label>
               <Select
                 value={formData.type}
                 onValueChange={val => handleChange('type', val)}
@@ -131,7 +133,7 @@ export default function IncidentForm({ incident, onBack, onSave}: IncidentFormPr
             </div>
 
             <div>
-              <Label htmlFor="purok">Purok / Zone *</Label>
+              <Label htmlFor="purok" className="block text-sm text-gray-700 dark:text-gray-300 mb-2">Purok / Zone *</Label>
               <Select
                 value={formData.purok}
                 onValueChange={val => handleChange('purok', val)}
@@ -149,7 +151,7 @@ export default function IncidentForm({ incident, onBack, onSave}: IncidentFormPr
             </div>
 
             <div className="md:col-span-2">
-              <Label htmlFor="location">Location *</Label>
+              <Label htmlFor="location" className="block text-sm text-gray-700 dark:text-gray-300 mb-2">Location *</Label>
               <Input
                 id="location"
                 type="text"
@@ -161,7 +163,7 @@ export default function IncidentForm({ incident, onBack, onSave}: IncidentFormPr
             </div>
 
             <div>
-              <Label htmlFor="reportedBy">Reported By *</Label>
+              <Label htmlFor="reportedBy" className="block text-sm text-gray-700 dark:text-gray-300 mb-2">Reported By *</Label>
               <Input
                 id="reportedBy"
                 type="text"
@@ -173,7 +175,7 @@ export default function IncidentForm({ incident, onBack, onSave}: IncidentFormPr
             </div>
 
             <div>
-              <Label htmlFor="assignedOfficer">Assigned Officer *</Label>
+              <Label htmlFor="assignedOfficer" className="block text-sm text-gray-700 dark:text-gray-300 mb-2">Assigned Officer *</Label>
               <Input
                 id="assignedOfficer"
                 type="text"
@@ -185,7 +187,7 @@ export default function IncidentForm({ incident, onBack, onSave}: IncidentFormPr
             </div>
 
             <div className="md:col-span-2">
-              <Label htmlFor="description">Description *</Label>
+              <Label htmlFor="description" className="block text-sm text-gray-700 dark:text-gray-300 mb-2">Description *</Label>
               <Textarea
                 id="description"
                 rows={4}
@@ -199,8 +201,10 @@ export default function IncidentForm({ incident, onBack, onSave}: IncidentFormPr
         </div>
 
         {/* Involved Parties */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 space-y-4">
-          <h3 className="text-lg font-semibold">Involved Parties</h3>
+        <div className="rounded-lg border shadow-sm p-6
+          bg-white text-gray-800 border-gray-200
+           dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700">
+          <h3 className="text-lg mb-4 font-semibold text-gray-900 dark:text-gray-100">Involved Parties</h3>
 
           <div className="flex gap-2 mb-2">
             <Input
@@ -224,14 +228,16 @@ export default function IncidentForm({ incident, onBack, onSave}: IncidentFormPr
         </div>
 
         {/* Status & Notes */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 space-y-4">
-          <h3 className="text-lg font-semibold">Status & Notes</h3>
+        <div className="rounded-lg border shadow-sm p-6
+          bg-white text-gray-800 border-gray-200
+           dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700">
+          <h3 className="text-lg mb-4 font-semibold text-gray-900 dark:text-gray-100">Status & Notes</h3>
 
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div>
-              <Label htmlFor="status">Status *</Label>
+              <Label htmlFor="status" className="block text-sm text-gray-700 dark:text-gray-300 mb-2">Status *</Label>
               <Select
-                value={formData.status}
+                value={formData.status} 
                 onValueChange={val => handleChange('status', val as Incident['status'])}
               >
                 <SelectTrigger id="status">
@@ -247,7 +253,7 @@ export default function IncidentForm({ incident, onBack, onSave}: IncidentFormPr
             </div>
 
             <div className="md:col-span-2">
-              <Label htmlFor="notes">Notes / Remarks</Label>
+              <Label htmlFor="notes" className="block text-sm text-gray-700 dark:text-gray-300 mb-2">Notes / Remarks</Label>
               <Textarea
                 id="notes"
                 rows={3}
@@ -260,11 +266,11 @@ export default function IncidentForm({ incident, onBack, onSave}: IncidentFormPr
         </div>
 
         <div className="flex gap-4">
-          <Button type="submit" variant="default" className="flex items-center gap-2">
+          <Button type="submit" variant="default" className="flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700">
             <Save className="w-5 h-5" />
             {incident ? 'Update Incident' : 'Report Incident'}
           </Button>
-          <Button type="button" variant="outline" onClick={onBack}>
+          <Button type="button" variant="outline" onClick={onBack} className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 ">
             Cancel
           </Button>
         </div>

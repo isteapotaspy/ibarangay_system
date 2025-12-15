@@ -1,5 +1,6 @@
 "use client"
 
+import { JSX } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { ChevronRight, type LucideIcon } from "lucide-react"
@@ -14,7 +15,7 @@ import {
   SidebarGroup,
   SidebarGroupLabel,
   SidebarMenu,
-  SidebarMenuButton,
+  SidebarMenuButton,  
   SidebarMenuItem,
   SidebarMenuSub,
   SidebarMenuSubButton,
@@ -23,12 +24,14 @@ import {
 
 type NavItem = {
   title: string
-  url: string
+  url?: string
   icon?: LucideIcon
   items?: {
     title: string
     url: string
+    render?: () => React.ReactNode
   }[]
+  render?: () => React.ReactNode
 }
 
 export function NavMain({ items }: { items: NavItem[] }) {
@@ -51,9 +54,14 @@ export function NavMain({ items }: { items: NavItem[] }) {
 function NavMainItem({ item }: { item: NavItem }) {
   const pathname = usePathname()
   const hasSubItems = item.items && item.items.length > 0
-  const isActive = pathname.startsWith(item.url)
+  const isActive = pathname.startsWith(item.url || "")
 
   const [open, setOpen] = useState(isActive)
+
+  // If a custom render is provided, just render it instead
+  if (item.render) {
+    return <SidebarMenuItem>{item.render()}</SidebarMenuItem>
+  }
 
   return (
     <SidebarMenuItem>
@@ -73,24 +81,27 @@ function NavMainItem({ item }: { item: NavItem }) {
 
           <CollapsibleContent>
             <SidebarMenuSub>
-              {item.items!.map((sub) => (
-                <SidebarMenuSubItem key={sub.title}>
-                  <SidebarMenuSubButton
-                    asChild
-                    isActive={pathname === sub.url}
-                  >
-                    <Link href={sub.url}>
-                      <span>{sub.title}</span>
-                    </Link>
-                  </SidebarMenuSubButton>
-                </SidebarMenuSubItem>
-              ))}
+              {item.items!.map((sub) =>
+                sub.render ? (
+                  <SidebarMenuSubItem key={sub.title}>
+                    {sub.render()}
+                  </SidebarMenuSubItem>
+                ) : (
+                  <SidebarMenuSubItem key={sub.title}>
+                    <SidebarMenuSubButton asChild isActive={pathname === sub.url}>
+                      <Link href={sub.url}>
+                        <span>{sub.title}</span>
+                      </Link>
+                    </SidebarMenuSubButton>
+                  </SidebarMenuSubItem>
+                )
+              )}
             </SidebarMenuSub>
           </CollapsibleContent>
         </Collapsible>
       ) : (
         <SidebarMenuButton asChild isActive={isActive}>
-          <Link href={item.url}>
+          <Link href={item.url!}>
             {item.icon && <item.icon />}
             <span>{item.title}</span>
           </Link>

@@ -1,19 +1,21 @@
-"use client"
+'use client';
 
-import { JSX } from "react"
-import React, { type ReactNode } from "react"
+import { useTheme } from "@/context/ThemeContext";
+import { JSX } from "react";
+import React from "react";
 
-type UniversalRecord = Record<string, any>
+type UniversalRecord = Record<string, any>;
 
 type DynamicCardListProps<T extends Record<string, any>> = {
-  data: T[]
-  onCardClick?: (item: T) => void
-  titleField?: string
-  statusField?: string
-  labelMap?: Record<string, string>
-  hiddenFields?: string[]
-  renderField?: (value: any, key: string, item: T) => JSX.Element | string | null
-}
+  data: T[];
+  onCardClick?: (item: T) => void;
+  titleField?: string;
+  statusField?: string;
+  labelMap?: Record<string, string>;
+  hiddenFields?: string[];
+  renderField?: (value: any, key: string, item: T) => JSX.Element | string | null;
+};
+
 export default function DynamicCardList<T extends UniversalRecord>({
   data,
   onCardClick,
@@ -23,91 +25,94 @@ export default function DynamicCardList<T extends UniversalRecord>({
   hiddenFields = [],
   renderField,
 }: DynamicCardListProps<T>) {
+  const { theme } = useTheme();
+
+  const badgeColors = (status: string) => {
+    if (theme === "dark") {
+      if (status === "Pending") return "bg-orange-700 text-orange-200";
+      if (status === "Investigating") return "bg-yellow-700 text-yellow-200";
+      if (status === "Resolved") return "bg-green-700 text-green-200";
+      return "bg-gray-700 text-gray-200";
+    } else {
+      if (status === "Pending") return "bg-orange-100 text-orange-700";
+      if (status === "Investigating") return "bg-yellow-100 text-yellow-700";
+      if (status === "Resolved") return "bg-green-100 text-green-700";
+      return "bg-gray-100 text-gray-700";
+    }
+  };
+
   return (
-    <div className="space-y-4">
+    <div className={`space-y-4 ${theme === "dark" ? "text-gray-200" : "text-gray-900"}`}>
       {data.map((item, index) => (
         <div
           key={item.id || index}
-          className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow cursor-pointer"
+          className={`rounded-lg border p-6 shadow-sm hover:shadow-md transition-shadow cursor-pointer
+            ${theme === "dark" ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"}`}
           onClick={() => onCardClick?.(item)}
         >
-          {/* Header: Title + Status */}
           <div className="flex items-start justify-between mb-4">
             <div className="flex-1">
               <div className="flex items-center gap-3 mb-2">
-                <h4 className="font-semibold text-lg">{titleField ? item[titleField] : `Record ${index + 1}`}</h4>
+                <h4 className="font-semibold text-lg">
+                  {titleField ? item[titleField] : `Record ${index + 1}`}
+                </h4>
                 {statusField && item[statusField] && (
-                  <span className={`px-2 py-1 rounded text-xs ${
-                    item[statusField] === 'Pending' ? 'bg-orange-100 text-orange-700' :
-                    item[statusField] === 'Investigating' ? 'bg-yellow-100 text-yellow-700' :
-                    item[statusField] === 'Resolved' ? 'bg-green-100 text-green-700' :
-                    'bg-gray-100 text-gray-700'
-                  }`}>
+                  <span className={`px-2 py-1 rounded text-xs ${badgeColors(item[statusField])}`}>
                     {item[statusField]}
                   </span>
                 )}
               </div>
               {item.dateReported && (
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
                   {item.id} • {item.dateReported} {item.timeReported ? `at ${item.timeReported}` : ""}
                 </p>
               )}
             </div>
           </div>
 
-          {/* Description */}
           {item.description && <p className="text-sm mb-4">{item.description}</p>}
 
-          {/* Grid info */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
-          {/* Location */}
             {!hiddenFields.includes("location") && item.location && (
               <div>
-                <p className="text-gray-600">Location</p>
+                <p className="text-gray-400 dark:text-gray-500">Location</p>
                 <p>{item.location}</p>
               </div>
             )}
-
-            {/* Purok / Zone */}
             {!hiddenFields.includes("purok") && item.purok && (
               <div>
-                <p className="text-gray-600">Purok / Zone</p>
+                <p className="text-gray-400 dark:text-gray-500">Purok / Zone</p>
                 <p>{item.purok}</p>
               </div>
             )}
-
-          {/* Reported By */}
             {!hiddenFields.includes("reportedBy") && item.reportedBy && (
               <div>
-                <p className="text-gray-600">Reported By</p>
+                <p className="text-gray-400 dark:text-gray-500">Reported By</p>
                 <p>{item.reportedBy}</p>
               </div>
             )}
-
-            {/* Assigned Officer */}
             {!hiddenFields.includes("assignedOfficer") && item.assignedOfficer && (
               <div>
-                <p className="text-gray-600">Assigned Officer</p>
+                <p className="text-gray-400 dark:text-gray-500">Assigned Officer</p>
                 <p>{item.assignedOfficer}</p>
               </div>
             )}
           </div>
 
-          {/* Notes */}
           {item.notes && (
-            <div className="mt-4 p-3 bg-gray-50 rounded-lg">
-              <p className="text-sm text-gray-600">Notes: {item.notes}</p>
+            <div className="mt-4 p-3 rounded-lg bg-gray-100 dark:bg-gray-700">
+              <p className="text-sm text-gray-600 dark:text-gray-300">Notes: {item.notes}</p>
             </div>
           )}
         </div>
       ))}
 
-      {/* Empty state */}
       {data.length === 0 && (
-        <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
-          <p className="text-gray-600">No incidents found</p>
+        <div className="text-center py-12 rounded-lg border border-gray-200 dark:border-gray-700
+          bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400">
+          <p>No items found</p>
         </div>
       )}
     </div>
-  )
+  );
 }

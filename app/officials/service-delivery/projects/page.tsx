@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { Search } from "lucide-react"
+import { Search, Plus } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -15,6 +15,7 @@ import PropertyForm from "@/components/property-form"
 import BorrowModal from "@/components/borrow-modal"
 
 import { PropertyDisc } from "@/amplify/backend/functions/propertyApi/src/Property"
+
 import {
   listProperties,
   createProperty,
@@ -151,7 +152,7 @@ function EntryDrawer({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="max-w-md p-6 overflow-y-auto">
+      <SheetContent className="w-[50vw] max-w-none p-6 overflow-y-auto text-sm" style={{ width:'30vw', maxWidth:'30vw' }}>
         <PropertyForm
           property={property}
           onBack={() => onOpenChange(false)}
@@ -320,7 +321,8 @@ export default function PropertyPage() {
 
         <div className="flex gap-2">
           <PropertySearchPopover data={properties} onSearch={setFilteredProperties} />
-          <Button onClick={() => { setSelectedProperty(null); setDrawerOpen(true) }}>New</Button>
+          <Button onClick={() => { setSelectedProperty(null); setDrawerOpen(true) }}> <Plus className="w-4 h-4 mr-2" /> New
+          </Button>
         </div>
       </div>
 

@@ -3,23 +3,17 @@
 import * as React from "react"
 import { useRouter } from "next/navigation"
 import {
-  AudioWaveform,
-  Command,
-  Frame,
-  GalleryVerticalEnd,
-  Map,
   LayoutDashboard,
   Package,
-  PieChart,
-  Settings2,
   ShieldAlert,
   UsersRound,
+  Settings2,
+  Sun,
+  Moon,
+  GalleryVerticalEnd,
 } from "lucide-react"
 
-import Logob from "@/public/logob.png"
-
 import { NavMain } from "@/components/nav-main"
-import { NavProjects } from "@/components/nav-projects"
 import { NavUser } from "@/components/nav-user"
 import { TeamSwitcher } from "@/components/team-switcher"
 import {
@@ -31,31 +25,22 @@ import {
 } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button"
 
-// This is sample data.
-const data = {
-  user: {
-    name: "juanluna",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
-  teams: [
+import { useTheme } from "@/context/ThemeContext"
+
+export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { theme, toggleTheme } = useTheme()
+
+  // Define nav items here so we have access to theme & toggleTheme
+  const navMain = [
     {
-      name: "iBarangay",
-      logo: GalleryVerticalEnd,
-      plan: "Management System",
-    },
-  ],
-  navMain: [
-    { 
       title: "Dashboard",
       url: "/officials/dashboard",
       icon: LayoutDashboard,
     },
-
-    { title: "Residents",
+    {
+      title: "Residents",
       url: "/officials/residentinformation",
       icon: UsersRound,
-      isActive: true,
       items: [
         {
           title: "List",
@@ -68,14 +53,8 @@ const data = {
       url: "/officials/service-delivery/maintenance",
       icon: Package,
       items: [
-        {
-          title: "Maintenance",
-          url: "/officials/service-delivery/maintenance",
-        },
-        {
-          title: "Properties",
-          url: "/officials/service-delivery/projects",
-        }
+        { title: "Maintenance", url: "/officials/service-delivery/maintenance" },
+        { title: "Properties", url: "/officials/service-delivery/projects" },
       ],
     },
     {
@@ -83,88 +62,43 @@ const data = {
       url: "/officials/peaceandorder",
       icon: ShieldAlert,
       items: [
-        {
-          title: "Violations / Incidents",
-          url: "/officials/peaceandorder/incidents",
-        },
+        { title: "Violations / Incidents", url: "/officials/peaceandorder/incidents" },
       ],
     },
-    // {
-    //   title: "Filing",
-    //   url: "/officials/certificate",
-    //   icon: ShieldAlert,
-    //   items: [
-    //     {
-    //       title: "Certificates",
-    //       url: "/officials/certificate",
-    //     },
-    //   ],
-    // },
-    // {
-    //   title: "Settings",
-    //   url: "#",
-    //   icon: Settings2,
-    //   items: [
-    //     {
-    //       title: "General",
-    //       url: "#",
-    //     },
-    //     {
-    //       title: "Team",
-    //       url: "#",
-    //     },
-    //     {
-    //       title: "Billing",
-    //       url: "#",
-    //     },
-    //     {
-    //       title: "Limits",
-    //       url: "#",
-    //     },
-    //   ],
-    // },
-  ],
- /* projects: [
     {
-      name: "Design Engineering",
-      url: "#",
-      icon: Frame,
+      title: "Filing",
+      url: "/officials/certificate",
+      icon: ShieldAlert,
+      items: [
+        { title: "Certificates", url: "/officials/certificate" },
+      ],
     },
+  ]
+
+  const user = {
+    name: "juanluna",
+    email: "m@example.com",
+    avatar: "/avatars/shadcn.jpg",
+  }
+
+  const teams = [
     {
-      name: "Sales & Marketing",
-      url: "#",
-      icon: PieChart,
+      name: "iBarangay",
+      logo: GalleryVerticalEnd,
+      plan: "Management System",
     },
-    {
-      name: "Travel",
-      url: "#",
-      icon: Map,
-    },
-  ],
-} */
-}
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const router = useRouter()
+  ]
 
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <TeamSwitcher teams={data.teams} />
+        <TeamSwitcher teams={teams} />
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
-        {/*<NavProjects projects={data.projects} /> */}
+        <NavMain items={navMain} />
       </SidebarContent>
       <SidebarFooter>
-        <Button variant="outline" 
-          onClick={() => {
-            router.push('/')
-          }}>
-
-          Log out
-
-        </Button>
-        {/* <NavUser user={data.user} /> */}
+        <NavUser user={user} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

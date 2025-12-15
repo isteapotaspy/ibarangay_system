@@ -10,16 +10,11 @@ import { Select, SelectContent, SelectTrigger, SelectValue, SelectItem } from "@
 import CertificateForm from "@/components/certificate-form"
 import CertificatePreview from "@/app/officials/certificate/preview/page"
 import { Certificate, mockCertificates as initialCertificates } from "@/app/officials/certificate/mockCertificates"
-import { mockOfficials } from "@/app/officials/certificate/mockOfficials"
+import { mockOfficials } from './mockOfficials' 
+import { useTheme } from "@/context/ThemeContext"
 
 // --- Search / Filter Popover ---
-export function CertificateSearchPopover({
-  data,
-  onSearch,
-}: {
-  data: Certificate[];
-  onSearch: (filtered: Certificate[]) => void;
-}) {
+export function CertificateSearchPopover({ data, onSearch }: { data: Certificate[], onSearch: (filtered: Certificate[]) => void }) {
   const [query, setQuery] = useState("")
   const [typeFilter, setTypeFilter] = useState<string | "all">("all")
   const [statusFilter, setStatusFilter] = useState<string | "all">("all")
@@ -48,12 +43,7 @@ export function CertificateSearchPopover({
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-96 p-4 space-y-4">
-        <Input
-          placeholder="Search keywords…"
-          value={query}
-          onChange={e => setQuery(e.target.value)}
-        />
-
+        <Input placeholder="Search keywords…" value={query} onChange={e => setQuery(e.target.value)} />
         <div>
           <p className="text-sm font-medium mb-1">Certificate Type:</p>
           <Select value={typeFilter} onValueChange={setTypeFilter}>
@@ -66,7 +56,6 @@ export function CertificateSearchPopover({
             </SelectContent>
           </Select>
         </div>
-
         <div>
           <p className="text-sm font-medium mb-1">Status:</p>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
@@ -79,7 +68,6 @@ export function CertificateSearchPopover({
             </SelectContent>
           </Select>
         </div>
-
         <Button className="w-full" onClick={runSearch}>Apply Search</Button>
       </PopoverContent>
     </Popover>
@@ -93,15 +81,14 @@ export default function CertificateSystem() {
   const [selectedCertificate, setSelectedCertificate] = useState<Certificate | null>(null)
   const [profileSheetOpen, setProfileSheetOpen] = useState(false)
   const [editSheetOpen, setEditSheetOpen] = useState(false)
+  const { theme } = useTheme()
 
-  // Auto-fill current active officials
   const getActiveOfficials = () => {
     const captain = mockOfficials.find(o => o.position === "Barangay Captain" && o.status === "Active")
     const secretary = mockOfficials.find(o => o.position === "Barangay Secretary" && o.status === "Active")
     return { captain, secretary }
   }
 
-  // Filtered certificates for table
   const filteredCertificates = useMemo(() => {
     return certificates.filter(cert =>
       cert.residentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -110,7 +97,6 @@ export default function CertificateSystem() {
     )
   }, [certificates, searchTerm])
 
-  // --- Add / Edit Certificate ---
   const handleSave = (certificate: Certificate) => {
     const { captain, secretary } = getActiveOfficials()
     setCertificates(prev => {
@@ -133,7 +119,6 @@ export default function CertificateSystem() {
     setSelectedCertificate(null)
   }
 
-  // --- Preview Certificate ---
   const handlePreview = (certificate: Certificate) => {
     setSelectedCertificate(certificate)
     setProfileSheetOpen(true)
@@ -150,49 +135,48 @@ export default function CertificateSystem() {
             onSearch={(results: Certificate[]) => setCertificates(results)}
           />
           <Button onClick={() => setEditSheetOpen(true)}>
-            <Plus className="w-4 h-4 mr-2" /> New Certificate
+            <Plus className="w-4 h-4 mr-2" /> New
           </Button>
         </div>
       </div>
 
       {/* TABLE */}
-      <div className="rounded-xl border border-gray-200 overflow-hidden shadow-md bg-white">
+      <div className={`rounded-xl border overflow-hidden shadow-md ${theme === "dark" ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"}`}>
         <table className="w-full min-w-full text-sm">
-          <thead className="bg-gray-50">
+          <thead className={theme === "dark" ? "bg-gray-700" : "bg-gray-50"}>
             <tr>
-              <th className="text-left font-medium text-black px-4 py-3">ID</th>
-              <th className="text-left font-medium text-black px-4 py-3">Resident</th>
-              <th className="text-left font-medium text-black px-4 py-3">Type</th>
-              <th className="text-left font-medium text-black px-4 py-3">Purpose</th>
-              <th className="text-left font-medium text-black px-4 py-3">Date Requested</th>
-              <th className="text-left font-medium text-black px-4 py-3">Status</th>
+              {["ID","Resident","Type","Purpose","Date Requested","Status"].map(header => (
+                <th key={header} className={`text-left font-medium px-4 py-3 ${theme === "dark" ? "text-gray-200" : "text-gray-900"}`}>
+                  {header}
+                </th>
+              ))}
             </tr>
           </thead>
           <tbody>
             {filteredCertificates.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-4 py-8 text-center text-gray-500">No certificate requests found</td>
+                <td colSpan={6} className={theme === "dark" ? "px-4 py-8 text-center text-gray-400" : "px-4 py-8 text-center text-gray-500"}>No certificate requests found</td>
               </tr>
             ) : filteredCertificates.map(cert => (
               <tr
                 key={cert.id}
-                className="border-t hover:bg-gray-50 cursor-pointer"
+                className={`border-t hover:bg-gray-50 cursor-pointer ${theme === "dark" ? "hover:bg-gray-700" : ""}`}
                 onClick={() => handlePreview(cert)}
               >
-                <td className="px-4 py-3">{cert.id}</td>
-                <td className="px-4 py-3">
+                <td className={theme === "dark" ? "px-4 py-3 text-gray-100" : "px-4 py-3 text-gray-700"}>{cert.id}</td>
+                <td className={theme === "dark" ? "px-4 py-3 text-gray-100" : "px-4 py-3 text-gray-700"}>
                   <div>{cert.residentName}</div>
-                  <div className="text-gray-400 text-xs">{cert.residentId}</div>
+                  <div className={theme === "dark" ? "text-gray-300 text-xs" : "text-gray-400 text-xs"}>{cert.residentId}</div>
                 </td>
-                <td className="px-4 py-3">{cert.certificateType}</td>
-                <td className="px-4 py-3">{cert.purpose}</td>
-                <td className="px-4 py-3">{cert.dateRequested}</td>
+                <td className={theme === "dark" ? "px-4 py-3 text-gray-100" : "px-4 py-3 text-gray-700"}>{cert.certificateType}</td>
+                <td className={theme === "dark" ? "px-4 py-3 text-gray-100" : "px-4 py-3 text-gray-700"}>{cert.purpose}</td>
+                <td className={theme === "dark" ? "px-4 py-3 text-gray-100" : "px-4 py-3 text-gray-700"}>{cert.dateRequested}</td>
                 <td className="px-4 py-3">
                   <span className={`px-2 py-1 rounded-full text-xs ${
-                    cert.status === "Pending" ? "bg-orange-100 text-orange-700" :
-                    cert.status === "Approved" ? "bg-yellow-100 text-yellow-700" :
-                    cert.status === "Completed" ? "bg-green-100 text-green-700" :
-                    "bg-red-100 text-red-700"
+                    cert.status === "Pending" ? (theme === "dark" ? "bg-orange-700 text-orange-100" : "bg-orange-100 text-orange-700") :
+                    cert.status === "Approved" ? (theme === "dark" ? "bg-yellow-700 text-yellow-100" : "bg-yellow-100 text-yellow-700") :
+                    cert.status === "Completed" ? (theme === "dark" ? "bg-green-700 text-green-100" : "bg-green-100 text-green-700") :
+                    theme === "dark" ? "bg-red-700 text-red-100" : "bg-red-100 text-red-700"
                   }`}>{cert.status}</span>
                 </td>
               </tr>
@@ -202,21 +186,19 @@ export default function CertificateSystem() {
 
         {/* PREVIEW SHEET */}
         <Sheet open={profileSheetOpen} onOpenChange={setProfileSheetOpen}>
-          <SheetContent side="right" className="h-full p-6 overflow-y-auto text-sm bg-white shadow-xl" style={{ width: '50vw' }}>
-            {selectedCertificate && (
-              <CertificatePreview certificate={selectedCertificate} onBack={() => setProfileSheetOpen(false)} />
-            )}
+          <SheetContent side="right" className={`h-full p-6 overflow-y-auto text-sm ${theme === "dark" ? "bg-gray-800" : "bg-white"} shadow-xl`} style={{ width: '50vw', maxWidth: '50vw' }}>
+            {selectedCertificate && <CertificatePreview certificate={selectedCertificate} onBack={() => setProfileSheetOpen(false)} />}
           </SheetContent>
         </Sheet>
 
         {/* FORM SHEET */}
         <Sheet open={editSheetOpen} onOpenChange={setEditSheetOpen}>
-          <SheetContent side="right" className="p-6 overflow-y-auto text-sm" style={{ width: '30vw' }}>
+          <SheetContent side="right" className={`p-6 overflow-y-auto text-sm ${theme === "dark" ? "bg-gray-800" : "bg-white"}`} style={{ width: '50vw', maxWidth: '50vw' }}>
             <CertificateForm
               certificate={selectedCertificate ?? null}
               onBack={() => setEditSheetOpen(false)}
               onSave={handleSave}
-              activeOfficials={getActiveOfficials()} // Pass active officials to the form
+              activeOfficials={getActiveOfficials()}
             />
           </SheetContent>
         </Sheet>

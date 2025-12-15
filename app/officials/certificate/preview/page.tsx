@@ -36,12 +36,12 @@ export default function CertificatePreview({ certificate, onBack }: CertificateP
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <button onClick={onBack} className="p-2 hover:bg-gray-100 rounded-lg">
+          <button onClick={onBack} className="p-2 hover:bg-gray-100 rounded-lg dark:hover:text-black">
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div>
-            <h2 className="text-2xl">Certificate Preview</h2>
-            <p className="text-gray-600">{certificate.id}</p>
+            <h2 className="text-2xl text-gray-900 dark:text-gray-100">Certificate Preview</h2>
+            <p className="text-gray-600 dark:text-gray-400">{certificate.id}</p>
           </div>
         </div>
         <button 
@@ -55,7 +55,7 @@ export default function CertificatePreview({ certificate, onBack }: CertificateP
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Certificate Preview */}
         <div className="lg:col-span-2" ref={certificateRef}>
-          <div className="bg-white border-4 border-blue-600 rounded-lg p-8 shadow-lg">
+          <div className="bg-white border-4 border-blue-600 rounded-lg p-8 shadow-lg text-gray-800">
             {/* Header */}
             <div className="text-center mb-8 border-b-2 border-blue-600 pb-6">
               <h1 className="text-3xl mb-2">Republic of the Philippines</h1>
@@ -133,39 +133,39 @@ export default function CertificatePreview({ certificate, onBack }: CertificateP
         </div>
 
         {/* Details */}
-        <div className="lg:col-span-1 space-y-6">
+        <div className="lg:col-span-1 space-y-6 ">
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg mb-4">Request Details</h3>
+            <h3 className="text-lg mb-4 text-gray-900">Request Details</h3>
             <div className="space-y-3 text-sm">
               <div>
                 <p className="text-gray-600">Certificate ID</p>
                 <p>{certificate.id}</p>
               </div>
               <div>
-                <p className="text-gray-600">Resident</p>
-                <p>{certificate.residentName}</p>
-                <p className="text-xs text-gray-500">{certificate.residentId}</p>
+                <p className="text-gray-900">Resident</p>
+                <p className="dark:text-gray-600">{certificate.residentName}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-600">{certificate.residentId}</p>
               </div>
               <div>
                 <p className="text-gray-600">Family ID</p>
-                <p>{certificate.familyId}</p>
+                <p className="dark:text-gray-600">{certificate.familyId}</p>
               </div>
               <div>
                 <p className="text-gray-600">Certificate Type</p>
-                <p>{certificate.certificateType}</p>
+                <p className="dark:text-gray-600">{certificate.certificateType}</p>
               </div>
               <div>
                 <p className="text-gray-600">Purpose</p>
-                <p>{certificate.purpose}</p>
+                <p className="dark:text-gray-600">{certificate.purpose}</p>
               </div>
               <div>
                 <p className="text-gray-600">Date Requested</p>
-                <p>{certificate.dateRequested}</p>
+                <p className="dark:text-gray-600"> {certificate.dateRequested}</p>
               </div>
               {certificate.dateIssued && (
                 <div>
                   <p className="text-gray-600">Date Issued</p>
-                  <p>{certificate.dateIssued}</p>
+                  <p className="dark:text-gray-600">{certificate.dateIssued}</p>
                 </div>
               )}
               <div>
@@ -181,12 +181,12 @@ export default function CertificatePreview({ certificate, onBack }: CertificateP
               </div>
               <div>
                 <p className="text-gray-600">Assigned Officer</p>
-                <p>{certificate.assignedOfficer}</p>
+                <p className="dark:text-gray-600">{certificate.assignedOfficer}</p>
               </div>
               {certificate.notes && (
                 <div>
                   <p className="text-gray-600">Notes</p>
-                  <p>{certificate.notes}</p>
+                  <p className="dark:text-gray-600">{certificate.notes}</p>
                 </div>
               )}
             </div>

@@ -32,4 +32,4 @@ export async function GET(req: NextRequest) {
   // TODO: create session / cookie
   console.log("Logged in user:", user)
 
-  return NextResponse.redirect("/");
+  return NextResponse.redirect("/")}

@@ -8,9 +8,10 @@ import { Resident } from "@/amplify/backend/functions/residentsApi/src/Resident"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Select, SelectContent, SelectTrigger, SelectValue, SelectItem } from "@/components/ui/select"
 import { Button } from '@/components/ui/button'
-import { Search, Loader2 } from 'lucide-react'
+import { Search, Loader2, Plus } from 'lucide-react'
 import { Input } from "@/components/ui/input"
 import { useResidents } from "@/hooks/use-Residents"
+import { useTheme } from "@/context/ThemeContext";
 
 /* =====================================================
 SEARCH POPOVER
@@ -127,6 +128,8 @@ export default function ResidentsPage() {
   const [profileSheetOpen, setProfileSheetOpen] = useState(false)
   const [editSheetOpen, setEditSheetOpen] = useState(false)
 
+  const { theme } = useTheme();
+
   // Update filtered data when residents change
   useEffect(() => {
     setFilteredData(residents);
@@ -222,16 +225,33 @@ export default function ResidentsPage() {
               setSelectedResident(null);
               setEditSheetOpen(true);
             }}
-          >
-            New
+          > <Plus className="w-4 h-4 mr-2" /> New
           </Button>
         </div>
       </div>
 
       {/* TABLE */}
-      <div className="rounded-xl border border-gray-200 overflow-hidden shadow-md bg-white">
+        <div className={`
+          rounded-xl border overflow-hidden shadow-md
+            ${theme === "dark" ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"}
+          `}>
         <table className="w-full min-w-full text-sm">
-          <thead className="bg-gray-50">
+        <thead className={theme === "dark" ? "bg-gray-700" : "bg-gray-50"}>
+            <tr>
+              {Object.values(tableColumns).map((header) => (
+                <th
+                  key={header}
+                  className={`text-left font-medium px-4 py-3 ${
+                    theme === "dark" ? "text-gray-200" : "text-gray-900"
+                  }`}
+                >
+                  {header}
+                </th>
+              ))}
+            </tr>
+          </thead>
+        <tbody>
+          {tableData.length === 0 ? (
             <tr>
               {Object.values(tableColumns).map((header) => (
                 <th key={header} className="text-left font-medium text-black px-4 py-3">
@@ -239,15 +259,76 @@ export default function ResidentsPage() {
                 </th>
               ))}
             </tr>
-          </thead>
-          <tbody>
-            {tableData.length === 0 ? (
-              <tr>
-                <td 
-                  colSpan={Object.keys(tableColumns).length} 
-                  className="px-4 py-8 text-center text-gray-500"
+          ) : (
+            tableData.map((row) => (
+              <tr
+                key={row.residentId}
+                className={`border-t cursor-pointer transition-colors
+                  ${theme === "dark" ? "hover:bg-gray-700 text-gray-200" : "hover:bg-gray-50 text-gray-700"}
+                `}
+                onClick={() => { setSelectedResident(row); setProfileSheetOpen(true) }}
                 >
-                  No residents found
+                {/* ID */}
+                <td className={`px-4 py-3 ${
+                    theme === "dark" ? "text-gray-100" : "text-gray-700"
+                  }`}>
+                    {row.residentId}
+                  </td>
+
+                {/* Name + Family ID */}
+                <td className={`px-4 py-3 ${
+                  theme === "dark" ? "text-gray-100" : "text-gray-700"
+                }`}>
+                  <div>{row.fullName}</div>
+                  {row.familyId && (
+                    <div className={theme === "dark" ? "text-gray-400 text-xs" : "text-gray-400 text-xs"}>
+                      {row.familyId}
+                    </div>
+                  )}
+                </td>
+
+                {/* Address + Purok */}
+                <td className={`px-4 py-3 ${
+                  theme === "dark" ? "text-gray-100" : "text-gray-700"
+                }`}>
+                  <div>{`${row.houseNumber} ${row.street}`}</div>
+                  <div className={theme === "dark" ? "text-gray-400 text-xs" : "text-gray-400 text-xs"}>{row.purok}</div>
+                </td>
+
+                {/* Contact */}
+                <td className={`px-4 py-3 ${
+                  theme === "dark" ? "text-gray-100" : "text-gray-700"
+                }`}>{row.contactNumber}</td>
+
+                {/* Vulnerable Types */}
+                <td className="px-4 py-3">
+                  {row.vulnerableTypes && row.vulnerableTypes.length > 0
+                    ? row.vulnerableTypes.map((type: string) => (
+                        <span
+                          key={type}
+                          className="px-2 py-0.5 rounded-full text-xs bg-orange-100 text-orange-700 mr-1"
+                        >
+                          {type}
+                        </span>
+                      ))
+                    : (
+                      <span className="text-gray-400 text-xs">
+                        None
+                      </span>
+                    )}
+                </td>
+
+                {/* Status */}
+                <td className="px-4 py-3">
+                  <span className={`px-2 py-1 rounded-full text-xs ${
+                    row.status === 'Active' ? theme === 'dark' ? 'bg-green-700 text-green-100' : 'bg-green-100 text-green-700' :
+                    row.status === 'Inactive' ? theme === 'dark' ? 'bg-gray-700 text-gray-200' : 'bg-gray-100 text-gray-700' :
+                    row.status === 'Transferred Out' ? theme === 'dark' ? 'bg-yellow-700 text-yellow-100' : 'bg-yellow-100 text-yellow-700' :
+                    theme === 'dark' ? 'bg-red-700 text-red-100' : 'bg-red-100 text-red-700'
+                  }`}>
+                    {row.status}
+                  </span>
+
                 </td>
               </tr>
             ) : (
@@ -321,9 +402,8 @@ export default function ResidentsPage() {
       <Sheet open={profileSheetOpen} onOpenChange={setProfileSheetOpen} >
         <SheetContent
           side="right"
-          className="h-full p-6 overflow-y-auto text-sm bg-white shadow-xl"
-          style={{ width: '100vw', maxWidth: '80vw' }}
-          showClose={false}
+          className="h-full p-6 overflow-y-auto text-sm shadow-xl"
+          style={{ width: '50vw', maxWidth: '50vw' }} 
         >
           {selectedResident && (
             <ResidentProfile

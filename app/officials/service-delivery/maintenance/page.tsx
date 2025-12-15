@@ -1,360 +1,37 @@
-'use client';
+'use client'
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useEffect } from "react";
+import { Loader2 } from "lucide-react";
+import { format } from "date-fns";
+import { Search } from "lucide-react"
+import { Plus } from "lucide-react";
 
-// SHADCN UI components
+// SHADCN UI
 import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Select, SelectContent, SelectTrigger, SelectValue, SelectItem } from "@/components/ui/select"
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
-import { Label } from "@/components/ui/label";
-
-// Lucide icons
-import { LayoutDashboard, Table as TableIcon, ListChecks, KanbanSquare, Search, Loader2 } from "lucide-react";
 
 // Dynamic views
 import DynamicTable from "@/components/dynamicViewers/dynamic-table";
 import DynamicQueue from "@/components/dynamicViewers/dynamic-queue";
 import DynamicKanban from "@/components/dynamicViewers/dynamic-kanban";
-import { format } from "date-fns";
 
-// Hook
+// Hooks
 import { useMaintenance } from "@/hooks/use-maintenance";
+import { MaintenanceEntry } from "@/amplify/backend/functions/maintenanceApi/src/Maintenance";
 
-const columnHeaders: Record<string, string> = {
-  id: "ID",
-  type: "Type",
-  status: "Status",
-  priority: "Priority",
-  assignedTo: "Assigned To",
-  lastServiced: "Last Serviced",
-  nextServiceDue: "Next Service Due",
-  scheduledDate: "Scheduled Date",
-  issue: "Issue",
-};
+// Components
+import MaintenanceForm from "@/components/maintenance-form";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
 
-// Define proper type for the entry
-interface MaintenanceEntry {
-  id?: string;
-  type: string;
-  status: "pending" | "processing" | "resolved";
-  priority: 1 | 2 | 3 | 4 | 5;
-  assignedTo: string;
-  issue?: string;
-  lastServiced?: string;
-  nextServiceDue?: string;
-  scheduledDate?: string;
-}
+// Lucide Icons
+import { Table as TableIcon, ListChecks, KanbanSquare } from "lucide-react";
 
-// Priority descriptions (for UI only)
-const PRIORITY_OPTIONS = [
-  { value: 5, label: "5 - Critical", description: "Urgent attention required" },
-  { value: 4, label: "4 - High", description: "Important, address soon" },
-  { value: 3, label: "3 - Medium", description: "Standard priority" },
-  { value: 2, label: "2 - Low", description: "Address when possible" },
-  { value: 1, label: "1 - Very Low", description: "Minimal impact" },
-];
+import { useTheme } from "@/context/ThemeContext";
 
-// Entry Drawer - FIXED
-function EntryDrawer({ 
-  open, 
-  onOpenChange, 
-  entry, 
-  onSave, 
-  onDelete 
-}: { 
-  open: boolean; 
-  onOpenChange: (val: boolean) => void; 
-  entry: MaintenanceEntry | null; 
-  onSave: (data: MaintenanceEntry) => void; 
-  onDelete?: (id: string) => void 
-}) {
-  const [form, setForm] = useState<MaintenanceEntry>({
-    type: "",
-    status: "pending",
-    priority: 3,
-    assignedTo: "",
-    issue: "",
-    lastServiced: "",
-    nextServiceDue: "",
-    scheduledDate: "",
-  });
-  const [errors, setErrors] = useState<Record<string, string>>({});
-
-  // Update form when entry changes
-  useEffect(() => {
-    if (entry) {
-      setForm(entry);
-    } else {
-      // Reset form for new entry
-      setForm({
-        type: "",
-        status: "pending",
-        priority: 3,
-        assignedTo: "",
-        issue: "",
-        lastServiced: "",
-        nextServiceDue: "",
-        scheduledDate: "",
-      });
-    }
-    setErrors({}); // Clear errors when opening/closing
-  }, [entry, open]);
-
-  const handleChange = (key: keyof MaintenanceEntry, value: any) => {
-    setForm((prev) => ({ ...prev, [key]: value }));
-    // Clear error when user starts typing
-    if (errors[key]) {
-      setErrors(prev => ({ ...prev, [key]: "" }));
-    }
-  };
-
-  const validateForm = (): boolean => {
-    const newErrors: Record<string, string> = {};
-
-    // Required field validations
-    if (!form.type?.trim()) {
-      newErrors.type = "Type is required";
-    } else if (form.type.trim().length < 2) {
-      newErrors.type = "Type must be at least 2 characters";
-    }
-
-    if (!form.assignedTo?.trim()) {
-      newErrors.assignedTo = "Assigned To is required";
-    }
-
-    // Priority validation
-    if (form.priority < 1 || form.priority > 5) {
-      newErrors.priority = "Priority must be between 1 and 5";
-    }
-
-    // Date validations
-    if (form.lastServiced) {
-      const lastServicedDate = new Date(form.lastServiced);
-      if (isNaN(lastServicedDate.getTime())) {
-        newErrors.lastServiced = "Invalid date format";
-      }
-    }
-
-    if (form.nextServiceDue) {
-      const nextServiceDueDate = new Date(form.nextServiceDue);
-      if (isNaN(nextServiceDueDate.getTime())) {
-        newErrors.nextServiceDue = "Invalid date format";
-      }
-    }
-
-    if (form.scheduledDate) {
-      const scheduledDate = new Date(form.scheduledDate);
-      if (isNaN(scheduledDate.getTime())) {
-        newErrors.scheduledDate = "Invalid date format";
-      }
-    }
-
-    // Validate that next service due is after last serviced if both are provided
-    if (form.lastServiced && form.nextServiceDue) {
-      const lastServiced = new Date(form.lastServiced);
-      const nextServiceDue = new Date(form.nextServiceDue);
-      if (nextServiceDue <= lastServiced) {
-        newErrors.nextServiceDue = "Next service due must be after last service date";
-      }
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSave = () => {
-    if (validateForm()) {
-      // Clean the data before saving
-      const dataToSave: MaintenanceEntry = {
-        ...form,
-        type: form.type.trim(),
-        assignedTo: form.assignedTo.trim(),
-        issue: form.issue?.trim() || "",
-        // Only store priority value (1-5), not the description
-        priority: form.priority,
-      };
-
-      // Remove id if creating new entry (backend generates it)
-      if (!entry?.id) {
-        delete dataToSave.id;
-      }
-
-      onSave(dataToSave);
-      onOpenChange(false);
-    }
-  };
-
-  return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="p-6 max-w-md overflow-y-auto">
-        <SheetHeader>
-          <SheetTitle>{entry?.id ? "Edit Entry" : "New Entry"}</SheetTitle>
-          <SheetDescription>
-            Fill in the details below. {entry?.id ? "You can update or delete the entry." : ""}
-          </SheetDescription>
-        </SheetHeader>
-
-        <div className="flex flex-col gap-4 mt-4">
-          {/* Type Field */}
-          <div>
-            <Label htmlFor="type" className="text-sm font-medium">
-              Type *
-            </Label>
-            <Input 
-              id="type"
-              placeholder="Maintenance Type" 
-              value={form.type} 
-              onChange={(e) => handleChange("type", e.target.value)}
-              className={errors.type ? "border-red-500" : ""}
-            />
-            {errors.type && <p className="text-xs text-red-500 mt-1">{errors.type}</p>}
-          </div>
-          
-          {/* Status Field - Dropdown */}
-          <div>
-            <Label htmlFor="status" className="text-sm font-medium">
-              Status *
-            </Label>
-            <Select 
-              value={form.status} 
-              onValueChange={(value: "pending" | "processing" | "resolved") => handleChange("status", value)}
-            >
-              <SelectTrigger id="status" className={errors.status ? "border-red-500" : ""}>
-                <SelectValue placeholder="Select status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="processing">Processing</SelectItem>
-                <SelectItem value="resolved">Resolved</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          
-          {/* Assigned To Field */}
-          <div>
-            <Label htmlFor="assignedTo" className="text-sm font-medium">
-              Assigned To *
-            </Label>
-            <Input 
-              id="assignedTo"
-              placeholder="Person or team responsible" 
-              value={form.assignedTo} 
-              onChange={(e) => handleChange("assignedTo", e.target.value)}
-              className={errors.assignedTo ? "border-red-500" : ""}
-            />
-            {errors.assignedTo && <p className="text-xs text-red-500 mt-1">{errors.assignedTo}</p>}
-          </div>
-          
-          {/* Issue Field */}
-          <div>
-            <Label htmlFor="issue" className="text-sm font-medium">
-              Issue
-            </Label>
-            <Input 
-              id="issue"
-              placeholder="Description of the issue" 
-              value={form.issue || ""} 
-              onChange={(e) => handleChange("issue", e.target.value)}
-            />
-          </div>
-          
-          {/* Priority Field - Enhanced Dropdown */}
-          <div>
-            <Label htmlFor="priority" className="text-sm font-medium">
-              Priority *
-            </Label>
-            <Select 
-              value={form.priority.toString()} 
-              onValueChange={(value) => handleChange("priority", parseInt(value))}
-            >
-              <SelectTrigger id="priority" className={errors.priority ? "border-red-500" : ""}>
-                <SelectValue placeholder="Select priority" />
-              </SelectTrigger>
-              <SelectContent>
-                {PRIORITY_OPTIONS.map((option) => (
-                  <SelectItem key={option.value} value={option.value.toString()}>
-                    <div className="flex flex-col">
-                      <span>{option.label}</span>
-                      <span className="text-xs text-gray-500">{option.description}</span>
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {errors.priority && <p className="text-xs text-red-500 mt-1">{errors.priority}</p>}
-          </div>
-          
-          {/* Date Fields */}
-          <div>
-            <Label htmlFor="lastServiced" className="text-sm font-medium">
-              Last Serviced
-            </Label>
-            <Input 
-              id="lastServiced"
-              type="date" 
-              value={form.lastServiced ? format(new Date(form.lastServiced), "yyyy-MM-dd") : ""} 
-              onChange={(e) => handleChange("lastServiced", e.target.value)}
-              className={errors.lastServiced ? "border-red-500" : ""}
-            />
-            {errors.lastServiced && <p className="text-xs text-red-500 mt-1">{errors.lastServiced}</p>}
-          </div>
-          
-          <div>
-            <Label htmlFor="nextServiceDue" className="text-sm font-medium">
-              Next Service Due
-            </Label>
-            <Input 
-              id="nextServiceDue"
-              type="date" 
-              value={form.nextServiceDue ? format(new Date(form.nextServiceDue), "yyyy-MM-dd") : ""} 
-              onChange={(e) => handleChange("nextServiceDue", e.target.value)}
-              className={errors.nextServiceDue ? "border-red-500" : ""}
-            />
-            {errors.nextServiceDue && <p className="text-xs text-red-500 mt-1">{errors.nextServiceDue}</p>}
-          </div>
-          
-          <div>
-            <Label htmlFor="scheduledDate" className="text-sm font-medium">
-              Scheduled Date
-            </Label>
-            <Input 
-              id="scheduledDate"
-              type="date" 
-              value={form.scheduledDate ? format(new Date(form.scheduledDate), "yyyy-MM-dd") : ""} 
-              onChange={(e) => handleChange("scheduledDate", e.target.value)}
-              className={errors.scheduledDate ? "border-red-500" : ""}
-            />
-            {errors.scheduledDate && <p className="text-xs text-red-500 mt-1">{errors.scheduledDate}</p>}
-          </div>
-
-          <div className="flex gap-2 mt-4 justify-end">
-            {entry?.id && onDelete && (
-              <Button 
-                variant="destructive" 
-                onClick={() => { 
-                  if (confirm("Are you sure you want to delete this entry?")) {
-                    onDelete(entry.id as any); 
-                    onOpenChange(false); 
-                  }
-                }}
-              >
-                Delete
-              </Button>
-            )}
-            <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-            <Button variant="default" onClick={handleSave}>Save</Button>
-          </div>
-        </div>
-      </SheetContent>
-    </Sheet>
-  );
-}
-
-// Search Popover
-function SearchPopover({ 
+function MaintenanceSearchPopover({ 
   data, 
   onSearch, 
   columnHeaders 
@@ -441,49 +118,33 @@ function SearchPopover({
   );
 }
 
-// Main Maintenance Page - FIXED
 export default function MaintenancePage() {
-  const [view, setView] = useState<"dashboard" | "table" | "queue">("dashboard");
+  const [view, setView] = useState<"table" | "queue" | "kanban">("queue");
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedEntry, setSelectedEntry] = useState<any | null>(null);
-
-  // Use hook for backend CRUD
-  const { entries, loading, error, refresh, add, update, remove } = useMaintenance();
-
   const [filteredData, setFilteredData] = useState<any[]>([]);
 
-  // Sync filteredData whenever backend data changes
+  // CRUD hook
+  const { entries, loading, error, refresh, add, update, remove } = useMaintenance();
+
+  // Sync filtered data
   useEffect(() => {
     setFilteredData(entries);
   }, [entries]);
 
-  const handleSave = async (entry: any) => {
-    try {
-      if (entry.id) {
-        // Update existing entry
-        await update(entry.id, entry);
-      } else {
-        // Create new entry
-        await add(entry);
-      }
-      // Refresh to get latest data
-      await refresh();
-    } catch (error) {
-      console.error("Error saving entry:", error);
-      alert("Failed to save entry. Please try again.");
-    }
+  const columnHeaders: Record<string, string> = {
+    id: "ID",
+    type: "Type",
+    status: "Status",
+    priority: "Priority",
+    assignedTo: "Assigned To",
+    lastServiced: "Last Serviced",
+    nextServiceDue: "Next Service Due",
+    scheduledDate: "Scheduled Date",
+    issue: "Issue",
   };
 
-  const handleDelete = async (id: string) => {
-    try {
-      await remove(id);
-      await refresh();
-    } catch (error) {
-      console.error("Error deleting entry:", error);
-      alert("Failed to delete entry. Please try again.");
-    }
-  };
-
+  // Format data dates
   const formattedData = filteredData.map(d => ({
     ...d,
     lastServiced: d.lastServiced ? format(new Date(d.lastServiced), "yyyy-MM-dd") : "",
@@ -492,17 +153,34 @@ export default function MaintenancePage() {
   }));
 
   const queueData = [...formattedData].sort(
-  (a, b) =>
-    (b.priority ?? 0) - (a.priority ?? 0) ||
+    (a, b) =>
+    (a.priority ?? 0) - (b.priority ?? 0) ||
     String(a.id).localeCompare(String(b.id))
-);
+  );
 
-  const handleHistoryClick = (key: string, value: any, row: any) => {
-    setSelectedEntry(row as any);
-    setDrawerOpen(true);
+  // Handlers
+  const handleSave = async (entry: any) => {
+    try {
+      if (entry.id) await update(entry.id, entry);
+      else await add(entry);
+      await refresh();
+    } catch (err) {
+      console.error(err);
+      alert("Failed to save entry.");
+    }
   };
 
-  // Show loading state
+  const handleDelete = async (id: string) => {
+    try {
+      await remove(id);
+      await refresh();
+    } catch (err) {
+      console.error(err);
+      alert("Failed to delete entry.");
+    }
+  };
+
+  // Show loading
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -511,7 +189,7 @@ export default function MaintenancePage() {
     );
   }
 
-  // Show error state
+  // Show error
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center h-screen gap-4">
@@ -522,74 +200,87 @@ export default function MaintenancePage() {
   }
 
   return (
-    <div className="p-4 space-y-4">
-      <div className="flex justify-between items-center mb-4 flex-wrap gap-2">
+    <div className="space-y-6 p-4">
+      {/* HEADER */}
+      <div className="flex items-center justify-between px-6">
+        <h1 className="text-2xl font-bold">Maintenance and Repairs</h1>
         <div className="flex gap-2">
-          <Button 
-            variant={view === "dashboard" ? "default" : "ghost"} 
-            onClick={() => setView("dashboard")} 
-            className="text-lg font-bold px-4 py-2"
-          >
-            Maintenance Dashboard
+          <MaintenanceSearchPopover data={entries} onSearch={setFilteredData} columnHeaders={columnHeaders} />
+          <Button variant="outline" onClick={refresh}>Refresh</Button>
+          <Button variant="default" onClick={() => { setSelectedEntry(null); setDrawerOpen(true); }}><Plus className="w-4 h-4 mr-2" /> New
           </Button>
-          <Button variant={view === "table" ? "default" : "outline"} onClick={() => setView("table")}>
-            <TableIcon className="w-4 h-4 mr-2" /> Table
-          </Button>
-          <Button variant={view === "queue" ? "default" : "outline"} onClick={() => setView("queue")}>
-            <ListChecks className="w-4 h-4 mr-2" /> Queue
-          </Button>
-        </div>
-
-        <div className="flex gap-2">
-          <SearchPopover data={entries} onSearch={setFilteredData} columnHeaders={columnHeaders} />
-          <Button onClick={refresh} variant="outline">Refresh</Button>
-          <Button variant="default" onClick={() => { setSelectedEntry(null); setDrawerOpen(true); }}>New</Button>
         </div>
       </div>
+      {/* SWITCH BUTTONS */}
+      <div className="flex items-center justify-start px-6 gap-2">
+        <Button variant={view === "table" ? "default" : "outline"} onClick={() => setView("table")}>
+          <TableIcon className="w-4 h-4 mr-2" /> List
+        </Button>
+        <Button variant={view === "queue" ? "default" : "outline"} onClick={() => setView("queue")}>
+          <ListChecks className="w-4 h-4 mr-2" /> By Priority
+        </Button>
+        <Button variant={view === "kanban" ? "default" : "outline"} onClick={() => setView("kanban")}>
+          <KanbanSquare className="w-4 h-4 mr-2" /> By Status
+        </Button>
+      </div>
 
-      {view === "table" ? (
-        <div className="">
-          <DynamicTable
-            data={formattedData}
-            columnHeaders={columnHeaders}
-            onRowClick={(row) => { setSelectedEntry(row as any); setDrawerOpen(true); }}
-          />
-        </div>
- 
-      ) : view === "queue" ? (
+      {/* VIEWS */}
+      {view === "table" && (
+        <DynamicTable
+          data={formattedData}
+          columnHeaders={columnHeaders}
+          onRowClick={(row) => { setSelectedEntry(row); setDrawerOpen(true); }}
+        />
+      )}
+      {view === "queue" && (
         <DynamicQueue
           data={queueData}
-          renderCard={(row) => (
-            <div
-              className="bg-white rounded-lg shadow p-4 cursor-pointer hover:shadow-lg transition"
-              onClick={() => { setSelectedEntry(row); setDrawerOpen(true); }}
-            >
-              <div className="flex justify-between items-center mb-2">
-                <span className="font-semibold">{row.type}</span>
-                <span className="text-sm font-medium text-gray-500">Priority {row.priority}</span>
+          renderCard={(row) => {
+            const { theme } = useTheme();
+
+            return (
+              <div
+                className={`
+                  rounded-lg shadow p-4 cursor-pointer transition 
+                  hover:shadow-lg
+                  ${theme === "dark" ? "bg-gray-800 text-gray-200" : "bg-gray-50 text-gray-800"}
+                `}
+                onClick={() => { setSelectedEntry(row); setDrawerOpen(true); }}
+              >
+                <div className="flex justify-between items-center mb-2">
+                  <span className="font-semibold">{row.type}</span>
+                  <span className="text-sm font-medium text-gray-500">Priority {row.priority}</span>
+                </div>
+                <div className="text-sm mb-1">ID: {row.id}</div>
+                <div className="text-sm mb-1">Status: {row.status}</div>
+                <div className="text-sm mb-1">Assigned: {row.assignedTo}</div>
+                {row.issue && <div className="text-sm text-purple-600 mt-2">{row.issue}</div>}
+                {row.scheduledDate && (
+                  <div className="text-xs text-gray-500 mt-1">Scheduled: {row.scheduledDate}</div>
+                )}
               </div>
-              <div className="text-sm text-gray-700 mb-1">ID: {row.id}</div>
-              <div className="text-sm text-gray-700 mb-1">Status: {row.status}</div>
-              <div className="text-sm text-gray-700 mb-1">Assigned: {row.assignedTo}</div>
-              {row.issue && <div className="text-sm text-purple-600 mt-2">{row.issue}</div>}
-              {row.scheduledDate && <div className="text-xs text-gray-500 mt-1">Scheduled: {row.scheduledDate}</div>}
-            </div>
-          )}
+            );
+          }}
         />
-      ) : (
+      )}
+      {view === "kanban" && (
         <DynamicKanban
           data={formattedData}
-          onCardClick={(card) => { setSelectedEntry(card as any); setDrawerOpen(true); }}
+          onCardClick={(card) => { setSelectedEntry(card); setDrawerOpen(true); }}
         />
       )}
 
-      <EntryDrawer
-        open={drawerOpen}
-        onOpenChange={setDrawerOpen}
-        entry={selectedEntry}
-        onSave={handleSave}
-        onDelete={handleDelete}
-      />
+      {/* ENTRY SHEET */}
+      <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
+        <SheetContent className="p-6 max-w-md overflow-y-auto">
+          <MaintenanceForm
+            entry={selectedEntry}
+            onSave={handleSave}
+            onBack={() => setDrawerOpen(false)}
+            onDelete={handleDelete}
+          />
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }

@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet"
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover"
 
-import { Table as TableIcon, ListChecks, KanbanSquare, Search, CreditCard } from "lucide-react"
+import { Table as TableIcon, ListChecks, KanbanSquare, Search, CreditCard, Plus} from "lucide-react"
 
 import DynamicTable from "@/components/dynamicViewers/dynamic-table"
 import DynamicQueue from "@/components/dynamicViewers/dynamic-queue"
@@ -125,11 +125,8 @@ const EntryDrawer = memo(function EntryDrawer({
   
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetTitle className="sr-only">
-            {incident ? 'Edit Incident' : 'Create New Incident'}
-          </SheetTitle>
-      <SheetContent style={{ width:'30vw', maxWidth:'30vw' }} className="max-w-md p-6 overflow-y-auto">
-        <IncidentForm incident={incident} onBack={handleBack} onSave={onSave} />
+      <SheetContent style={{ width:'30vw', maxWidth:'30vw' }} className="w-[50vw] max-w-none p-6 overflow-y-auto text-sm">
+        <IncidentForm incident={incident} onBack={()=>onOpenChange(false)} onSave={onSave} />
       </SheetContent>
     </Sheet>
   )
@@ -220,7 +217,8 @@ export default function IncidentsPage() {
             incidentTypes={["Noise Complaint", "Theft", "Disturbance", "Traffic Violation", "Vandalism", "Curfew Violation", "Domestic Dispute", "Other"]}
             statusTypes={["Pending", "Investigating", "Resolved", "Closed"]}
           />
-          <Button variant="default" onClick={handleNewButtonClick}>New</Button>
+          <Button variant="default" onClick={()=>{ setSelectedIncident(null); setDrawerOpen(true) }}><Plus className="w-4 h-4 mr-2" /> New
+                    </Button>
         </div>
       </div>
 

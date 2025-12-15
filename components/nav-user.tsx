@@ -1,12 +1,14 @@
 "use client"
 
+import * as React from "react"
 import {
   BadgeCheck,
   Bell,
-  ChevronsUpDown,
   CreditCard,
+  ChevronsUpDown,
   LogOut,
-  Sparkles,
+  Sun,
+  Moon,
 } from "lucide-react"
 
 import {
@@ -25,10 +27,13 @@ import {
 } from "@/components/ui/dropdown-menu"
 import {
   SidebarMenu,
-  SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuButton,
   useSidebar,
 } from "@/components/ui/sidebar"
+
+import { Switch } from "@/components/ui/switch"
+import { useTheme } from "@/context/ThemeContext"
 
 export function NavUser({
   user,
@@ -40,6 +45,13 @@ export function NavUser({
   }
 }) {
   const { isMobile } = useSidebar()
+  const { theme, toggleTheme } = useTheme()
+  const [isDark, setIsDark] = React.useState(theme === "dark")
+
+  const handleToggle = () => {
+    toggleTheme()
+    setIsDark((prev) => !prev)
+  }
 
   return (
     <SidebarMenu>
@@ -61,14 +73,15 @@ export function NavUser({
               <ChevronsUpDown className="ml-auto size-4" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
+
           <DropdownMenuContent
-            className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
+            className="min-w-[220px] rounded-lg"
             side={isMobile ? "bottom" : "right"}
             align="end"
             sideOffset={4}
           >
-            <DropdownMenuLabel className="p-0 font-normal">
-              <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+            <DropdownMenuLabel className="p-0">
+              <div className="flex items-center gap-2 px-2 py-2 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
                   <AvatarImage src={user.avatar} alt={user.name} />
                   <AvatarFallback className="rounded-lg">CN</AvatarFallback>
@@ -79,32 +92,39 @@ export function NavUser({
                 </div>
               </div>
             </DropdownMenuLabel>
+
             <DropdownMenuSeparator />
+
             <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <Sparkles />
-                Upgrade to Pro
+              <DropdownMenuItem className="flex items-center gap-2">
+                <BadgeCheck /> Account
+              </DropdownMenuItem>
+              <DropdownMenuItem className="flex items-center gap-2">
+                <CreditCard /> Billing
+              </DropdownMenuItem>
+              <DropdownMenuItem className="flex items-center gap-2">
+                <Bell /> Notifications
               </DropdownMenuItem>
             </DropdownMenuGroup>
+
             <DropdownMenuSeparator />
+            {/* THEME TOGGLE */}
             <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <BadgeCheck />
-                Account
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <CreditCard />
-                Billing
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Bell />
-                Notifications
-              </DropdownMenuItem>
+              <div className="flex items-center space-x-2 px-2 py-1 cursor-default">
+                <Sun className="w-4 h-4 text-yellow-400" />
+                <Switch
+                  checked={isDark}
+                  onCheckedChange={handleToggle}
+                />
+                <Moon className="w-4 h-4 text-gray-500" />
+              </div>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <LogOut />
-              Log out
+
+            <DropdownMenuSeparator />
+
+            <DropdownMenuItem className="flex items-center gap-2">
+              <LogOut /> Log out
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

@@ -91,16 +91,16 @@ export default function PropertyForm({
       <div className="flex items-center gap-4">
         <button
           onClick={onBack}
-          className="p-2 hover:bg-gray-100 rounded-lg"
+          className="p-2 hover:bg-gray-100 rounded-lg "
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
 
         <div className="flex-1">
-          <h2 className="text-2xl font-semibold">
+          <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
             {property?.propertyId ? "Edit Property" : "Add New Property"}
           </h2>
-          <p className="text-gray-600">
+          <p className="text-gray-600 dark:text-gray-400">
             Fill in the property information below
           </p>
         </div>
@@ -119,24 +119,30 @@ export default function PropertyForm({
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* BASIC INFORMATION */}
-        <div className="bg-white rounded-lg border shadow-sm p-6">
-          <h3 className="text-lg mb-4">Basic Information</h3>
+        <div className="rounded-lg border shadow-sm p-6
+          bg-white text-gray-800 border-gray-200
+           dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700">
+          <h3 className="text-lg mb-4 text-gray-900 dark:text-gray-100">Basic Information</h3>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm mb-1">Property Name *</label>
+              <label className="block text-sm mb-1 text-gray-700 dark:text-gray-300">Property Name *</label>
               <input
                 required
                 value={formData.name}
                 onChange={(e) =>
                   setFormData({ ...formData, name: e.target.value })
                 }
-                className="w-full px-4 py-2 border rounded-lg"
+                className="w-full px-4 py-2 rounded-lg border
+                    bg-white text-gray-900 border-gray-300
+                    focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                    dark:bg-gray-900 dark:text-gray-100 dark:border-gray-600
+                    dark:focus:ring-blue-400"
               />
             </div>
 
             <div className="relative">
-              <label className="block text-sm mb-1">Category *</label>
+              <label className="block text-sm mb-1 text-gray-700 dark:text-gray-300">Category *</label>
               <div className="relative">
                 <input
                   required
@@ -148,20 +154,24 @@ export default function PropertyForm({
                   }}
                   onFocus={() => setShowCategoryDropdown(true)}
                   placeholder="Search or type category..."
-                  className="w-full px-4 py-2 border rounded-lg pr-10"
+                  className="w-full px-4 py-2 rounded-lg border
+                    bg-white text-gray-900 border-gray-300
+                    focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                    dark:bg-gray-900 dark:text-gray-100 dark:border-gray-600
+                    dark:focus:ring-blue-400"
                 />
-                <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-900" />
               </div>
               
               {/* Category Dropdown */}
               {showCategoryDropdown && filteredCategories.length > 0 && (
-                <div className="absolute z-10 w-full mt-1 bg-white border rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                <div className="absolute z-10 w-full mt-1 bg-white border rounded-lg shadow-lg max-h-60 overflow-y-auto dark:bg-gray-900">
                   {filteredCategories.map((cat) => (
                     <button
                       key={cat}
                       type="button"
                       onClick={() => handleCategorySelect(cat)}
-                      className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
+                      className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:bg-gray-900 dark:hover:bg-gray-900 transition-colors"
                     >
                       {cat}
                     </button>
@@ -171,7 +181,7 @@ export default function PropertyForm({
             </div>
 
             <div>
-              <label className="block text-sm mb-1">Quantity *</label>
+              <label className="block text-sm mb-1 text-gray-700 dark:text-gray-300">Quantity *</label>
               <input
                 type="number"
                 min={1}
@@ -184,12 +194,16 @@ export default function PropertyForm({
                     availableQuantity: Number(e.target.value), // Auto-update available
                   })
                 }
-                className="w-full px-4 py-2 border rounded-lg"
+                className="w-full px-4 py-2 rounded-lg border
+                    bg-white text-gray-900 border-gray-300
+                    focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                    dark:bg-gray-900 dark:text-gray-100 dark:border-gray-600
+                    dark:focus:ring-blue-400"
               />
             </div>
 
             <div>
-              <label className="block text-sm mb-1">Condition *</label>
+              <label className="block text-sm mb-1 text-gray-700 dark:text-gray-300">Condition *</label>
               <select
                 required
                 value={formData.condition}
@@ -199,7 +213,11 @@ export default function PropertyForm({
                     condition: e.target.value as PropertyDisc["condition"],
                   })
                 }
-                className="w-full px-4 py-2 border rounded-lg"
+                className="w-full px-4 py-2 rounded-lg border
+                    bg-white text-gray-900 border-gray-300
+                    focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                    dark:bg-gray-900 dark:text-gray-100 dark:border-gray-600
+                    dark:focus:ring-blue-400"
               >
                 <option value="Good">Good</option>
                 <option value="Fair">Fair</option>
@@ -211,32 +229,42 @@ export default function PropertyForm({
         </div>
 
         {/* LOCATION & DESCRIPTION */}
-        <div className="bg-white rounded-lg border shadow-sm p-6">
-          <h3 className="text-lg mb-4">Location & Description</h3>
+        <div className="rounded-lg border shadow-sm p-6
+          bg-white text-gray-800 border-gray-200
+           dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700">
+          <h3 className="text-lg mb-4 text-gray-900 dark:text-gray-100">Location & Description</h3>
 
           <div className="space-y-4">
             <div>
-              <label className="block text-sm mb-1">Location *</label>
+              <label className="block text-sm mb-1 text-gray-700 dark:text-gray-300">Location *</label>
               <input
                 required
                 value={formData.location}
                 onChange={(e) =>
                   setFormData({ ...formData, location: e.target.value })
                 }
-                className="w-full px-4 py-2 border rounded-lg"
+                className="w-full px-4 py-2 rounded-lg border
+                    bg-white text-gray-900 border-gray-300
+                    focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                    dark:bg-gray-900 dark:text-gray-100 dark:border-gray-600
+                    dark:focus:ring-blue-400"
                 placeholder="e.g. Storage Room A"
               />
             </div>
 
             <div>
-              <label className="block text-sm mb-1">Description</label>
+              <label className="block text-sm mb-1 text-gray-700 dark:text-gray-300">Description</label>
               <textarea
                 rows={4}
                 value={formData.description}
                 onChange={(e) =>
                   setFormData({ ...formData, description: e.target.value })
                 }
-                className="w-full px-4 py-2 border rounded-lg"
+                className="w-full px-4 py-2 rounded-lg border
+                    bg-white text-gray-900 border-gray-300
+                    focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                    dark:bg-gray-900 dark:text-gray-100 dark:border-gray-600
+                    dark:focus:ring-blue-400"
               />
             </div>
           </div>
@@ -244,8 +272,10 @@ export default function PropertyForm({
 
         {/* BORROW STATUS */}
         {property?.borrowRecords && property.borrowRecords.length > 0 && (
-          <div className="bg-orange-50 rounded-lg border border-orange-200 p-6">
-            <h3 className="text-lg mb-4 text-orange-800">Active Borrows</h3>
+          <div className="rounded-lg border shadow-sm p-6
+          bg-white text-gray-800 border-gray-200
+           dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700">
+            <h3 className="text-lg mb-4 text-orange-800 dark:text-gray-300">Active Borrows</h3>
             <div className="space-y-3">
               {property.borrowRecords
                 .filter((record) => record.status === "borrowed")
@@ -255,19 +285,19 @@ export default function PropertyForm({
                     className="space-y-2 text-sm border-b pb-2 last:border-0"
                   >
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Borrowed by:</span>
+                      <span className="text-gray-600  dark:text-gray-300">Borrowed by:</span>
                       <span className="font-medium">{record.borrowedBy}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Quantity:</span>
+                      <span className="text-gray-600 dark:text-gray-300">Quantity:</span>
                       <span>{record.quantity}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Borrow Date:</span>
+                      <span className="text-gray-600 dark:text-gray-300">Borrow Date:</span>
                       <span>{new Date(record.borrowDate).toLocaleDateString()}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Expected Return:</span>
+                      <span className="text-gray-600 dark:text-gray-300">Expected Return:</span>
                       <span>{new Date(record.returnDate).toLocaleDateString()}</span>
                     </div>
                   </div>
@@ -289,7 +319,7 @@ export default function PropertyForm({
           <button
             type="button"
             onClick={onBack}
-            className="px-6 py-3 border rounded-lg hover:bg-gray-50"
+            className="px-6 py-3 border rounded-lg hover:bg-gray-50 dark:hover:text-black"
           >
             Cancel
           </button>
