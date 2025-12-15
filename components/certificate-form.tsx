@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { ArrowLeft, Save, Search } from 'lucide-react';
+import { Resident } from "@/amplify/backend/functions/residentsApi/src/Resident"
 
 interface Certificate {
   id?: string
@@ -17,14 +18,6 @@ interface Certificate {
   captainSignature?: string
   secretarySignature?: string
   useDigitalSignature?: boolean
-}
-
-interface Resident {
-  id: string
-  firstName: string
-  lastName: string
-  familyId: string
-  purok: string
 }
 
 interface Official {
@@ -69,7 +62,7 @@ export default function CertificateForm({ certificate, onBack, onSave, activeOff
 
   const fetchResidents = async () => {
     try {
-      const response = await fetch('/api/residents');
+      const response = await fetch('/amplify/backend/functions/residentsApi/src/Resident');
       if (!response.ok) throw new Error('Failed to fetch residents');
       const data = await response.json();
       setResidents(data);
@@ -81,13 +74,13 @@ export default function CertificateForm({ certificate, onBack, onSave, activeOff
   const filteredResidents = residents.filter(r => 
     r.firstName.toLowerCase().includes(residentSearch.toLowerCase()) ||
     r.lastName.toLowerCase().includes(residentSearch.toLowerCase()) ||
-    r.id.toLowerCase().includes(residentSearch.toLowerCase())
+    r.residentId.toLowerCase().includes(residentSearch.toLowerCase())
   );
 
   const handleSelectResident = (resident: Resident) => {
     setFormData({
       ...formData,
-      residentId: resident.id,
+      residentId: resident.residentId,
       residentName: `${resident.firstName} ${resident.lastName}`,
       familyId: resident.familyId,
     });
@@ -131,21 +124,22 @@ export default function CertificateForm({ certificate, onBack, onSave, activeOff
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <button onClick={onBack} className="p-2 hover:bg-gray-100 rounded-lg">
+        <button onClick={onBack} className="p-2 hover:bg-gray-100 rounded-lg dark:hover:text-black">
           <ArrowLeft className="w-5 h-5" />
         </button>
         <div>
           <h2 className="text-2xl">{certificate?.id ? 'Edit Request' : 'New Certificate Request'}</h2>
-          <p className="text-gray-600">Fill in the request details below</p>
-        </div>
+          <p className="text-gray-600 dark:text-gray-500">Fill in the request details below</p>
+        </div>  
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h3 className="text-lg mb-4">Resident Information</h3>
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6  text-gray-800
+           dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700">
+          <h3 className="text-lg mb-4 text-gray-900 dark:text-gray-100">Resident Information</h3>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm text-gray-700 mb-2">Search Resident *</label>
+              <label className="block text-sm text-gray-700  dark:text-gray-300 mb-2">Search Resident *</label>
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
@@ -161,18 +155,19 @@ export default function CertificateForm({ certificate, onBack, onSave, activeOff
                   placeholder="Search by name or ID"
                 />
                 {showResidentList && residentSearch && (
-                  <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                  <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto *:text-gray-800
+           dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700">
                     {filteredResidents.length === 0 ? (
-                      <div className="px-4 py-2 text-sm text-gray-500">No residents found</div>
+                      <div className="px-4 py-2 text-sm text-gray-500  dark:text-gray-100">No residents found</div>
                     ) : (
                       filteredResidents.map((resident) => (
                         <div
-                          key={resident.id}
+                          key={resident.residentId}
                           onClick={() => handleSelectResident(resident)}
                           className="px-4 py-2 hover:bg-gray-50 cursor-pointer"
                         >
                           <p className="text-sm">{`${resident.firstName} ${resident.lastName}`}</p>
-                          <p className="text-xs text-gray-500">{resident.id} - {resident.purok}</p>
+                          <p className="text-xs text-gray-500">{resident.residentId} - {resident.purok}</p>
                         </div>
                       ))
                     )}
@@ -181,18 +176,19 @@ export default function CertificateForm({ certificate, onBack, onSave, activeOff
               </div>
             </div>
             {formData.residentId && (
-              <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg text-gray-800
+           dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700 ">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                   <div>
-                    <p className="text-gray-600">Resident ID</p>
+                    <p className="text-gray-600  dark:text-gray-100">Resident ID</p>
                     <p>{formData.residentId}</p>
                   </div>
                   <div>
-                    <p className="text-gray-600">Family ID</p>
+                    <p className="text-gray-600  dark:text-gray-100">Family ID</p>
                     <p>{formData.familyId}</p>
                   </div>
                   <div>
-                    <p className="text-gray-600">Name</p>
+                    <p className="text-gray-600  dark:text-gray-100">Name</p>
                     <p>{formData.residentName}</p>
                   </div>
                 </div>
@@ -201,16 +197,18 @@ export default function CertificateForm({ certificate, onBack, onSave, activeOff
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h3 className="text-lg mb-4">Certificate Details</h3>
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 text-gray-800
+           dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700">
+          <h3 className="text-lg mb-4  dark:text-gray-100">Certificate Details</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm text-gray-700 mb-2">Certificate Type *</label>
+              <label className="block text-sm text-gray-700 mb-2  dark:text-gray-300">Certificate Type *</label>
               <select
                 required
                 value={formData.certificateType}
                 onChange={(e) => setFormData({ ...formData, certificateType: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4  dark:text-gray-400 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                  text-gray-800 dark:bg-gray-800"
               >
                 <option value="Barangay Clearance">Barangay Clearance</option>
                 <option value="Certificate of Indigency">Certificate of Indigency</option>
@@ -221,17 +219,17 @@ export default function CertificateForm({ certificate, onBack, onSave, activeOff
               </select>
             </div>
             <div>
-              <label className="block text-sm text-gray-700 mb-2">Date Requested *</label>
+              <label className="block text-sm text-gray-700  dark:text-gray-300 mb-2">Date Requested *</label>
               <input
                 type="date"
                 required
                 value={formData.dateRequested}
                 onChange={(e) => setFormData({ ...formData, dateRequested: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-2 border dark:text-gray-400 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
             <div className="md:col-span-2">
-              <label className="block text-sm text-gray-700 mb-2">Purpose *</label>
+              <label className="block text-sm text-gray-700 mb-2  dark:text-gray-300">Purpose *</label>
               <input
                 type="text"
                 required
@@ -244,16 +242,18 @@ export default function CertificateForm({ certificate, onBack, onSave, activeOff
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h3 className="text-lg mb-4">Processing Information</h3>
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6  text-gray-800
+           dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700">
+          <h3 className="text-lg mb-4  dark:text-gray-100">Processing Information</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm text-gray-700 mb-2">Status *</label>
+              <label className="block text-sm text-gray-700  dark:text-gray-300 mb-2">Status *</label>
               <select
                 required
                 value={formData.status}
                 onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-2 border  dark:text-gray-400 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                 text-gray-800 dark:bg-gray-800"
               >
                 <option value="Pending">Pending</option>
                 <option value="Approved">Approved</option>
@@ -262,17 +262,17 @@ export default function CertificateForm({ certificate, onBack, onSave, activeOff
               </select>
             </div>
             <div>
-              <label className="block text-sm text-gray-700 mb-2">Assigned Officer *</label>
+              <label className="block text-sm text-gray-700  dark:text-gray-300 mb-2">Assigned Officer *</label>
               <input
                 type="text"
                 required
                 value={formData.assignedOfficer}
                 onChange={(e) => setFormData({ ...formData, assignedOfficer: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-2 dark:text-gray-400 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
             <div className="md:col-span-2">
-              <label className="block text-sm text-gray-700 mb-2">Notes / Remarks</label>
+              <label className="block text-sm text-gray-700 mb-2  dark:text-gray-300">Notes / Remarks</label>
               <textarea
                 value={formData.notes}
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
@@ -297,7 +297,7 @@ export default function CertificateForm({ certificate, onBack, onSave, activeOff
             type="button"
             onClick={onBack}
             disabled={loading}
-            className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:bg-gray-100 disabled:cursor-not-allowed"
+            className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:bg-gray-100 disabled:cursor-not-allowed dark:hover:text-black"
           >
             Cancel
           </button>
