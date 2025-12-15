@@ -71,17 +71,19 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="px-10 py-8 space-y-10">
       {/* HEADER */}
-      <div>
-        <h1 className="text-3xl font-bold">Dashboard</h1>
-        <p className="text-gray-600">Overview of barangay population and statistics</p>
-      </div>
+      <div className="space-y-1">
+          <h1 className="text-3xl font-bold leading-tight">Dashboard</h1>
+          <p className="text-sm text-gray-500">
+            Overview of barangay population and statistics
+          </p>
+        </div>
 
       {/* POPULATION OVERVIEW CARDS */}
       <div>
-        <h2 className="text-xl font-semibold mb-4 px-4 lg:px-6">Population Overview</h2>
-        <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
+        <h2 className="text-lg font-semibold mb-6 px-4 lg:px-6">Population Overview</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
           <Card className="@container/card">
             <CardHeader>
               <CardDescription>Total Population</CardDescription>
@@ -95,7 +97,7 @@ export default function Dashboard() {
                 </Badge>
               </CardAction>
             </CardHeader>
-            <CardFooter className="flex-col items-start gap-1.5 text-sm">
+            <CardFooter className="flex-col items-start gap-2 text-sm leading-relaxed">
               <div className="line-clamp-1 flex gap-2 font-medium">
                 All active residents <IconTrendingUp className="size-4" />
               </div>
@@ -118,7 +120,7 @@ export default function Dashboard() {
                 </Badge>
               </CardAction>
             </CardHeader>
-            <CardFooter className="flex-col items-start gap-1.5 text-sm">
+            <CardFooter className="flex-col items-start gap-2 text-sm leading-relaxed">
               <div className="line-clamp-1 flex gap-2 font-medium">
                 Unique family groups <IconTrendingUp className="size-4" />
               </div>
@@ -140,7 +142,7 @@ export default function Dashboard() {
                 </Badge>
               </CardAction>
             </CardHeader>
-            <CardFooter className="flex-col items-start gap-1.5 text-sm">
+            <CardFooter className="flex-col items-start gap-2 text-sm leading-relaxed">
               <div className="line-clamp-1 flex gap-2 font-medium">
                 {stats.localPercentage}% of population
               </div>
@@ -162,7 +164,7 @@ export default function Dashboard() {
                 </Badge>
               </CardAction>
             </CardHeader>
-            <CardFooter className="flex-col items-start gap-1.5 text-sm">
+            <CardFooter className="flex-col items-start gap-2 text-sm leading-relaxed">
               <div className="line-clamp-1 flex gap-2 font-medium">
                 {stats.nonLocalPercentage}% of population
               </div>
@@ -177,7 +179,7 @@ export default function Dashboard() {
       {/* VULNERABLE & SPECIAL CATEGORIES */}
       <div>
         <h2 className="text-xl font-semibold mb-4 px-4 lg:px-6">Vulnerable & Special Categories</h2>
-        <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
           <Card className="@container/card">
             <CardHeader>
               <CardDescription>Senior Citizens</CardDescription>
@@ -190,7 +192,7 @@ export default function Dashboard() {
                 </Badge>
               </CardAction>
             </CardHeader>
-            <CardFooter className="flex-col items-start gap-1.5 text-sm">
+            <CardFooter className="flex-col items-start gap-2 text-sm leading-relaxed">
               <div className="line-clamp-1 flex gap-2 font-medium">
                 60 years old and above
               </div>
@@ -212,7 +214,7 @@ export default function Dashboard() {
                 </Badge>
               </CardAction>
             </CardHeader>
-            <CardFooter className="flex-col items-start gap-1.5 text-sm">
+            <CardFooter className="flex-col items-start gap-2 text-sm leading-relaxed">
               <div className="line-clamp-1 flex gap-2 font-medium">
                 Single parent households
               </div>
@@ -234,7 +236,7 @@ export default function Dashboard() {
                 </Badge>
               </CardAction>
             </CardHeader>
-            <CardFooter className="flex-col items-start gap-1.5 text-sm">
+            <CardFooter className="flex-col items-start gap-2 text-sm leading-relaxed">
               <div className="line-clamp-1 flex gap-2 font-medium">
                 Persons with disabilities
               </div>
@@ -257,7 +259,7 @@ export default function Dashboard() {
                 </Badge>
               </CardAction>
             </CardHeader>
-            <CardFooter className="flex-col items-start gap-1.5 text-sm">
+            <CardFooter className="flex-col items-start gap-2 text-sm leading-relaxed">
               <div className="line-clamp-1 flex gap-2 font-medium">
                 Combined vulnerable groups
               </div>
@@ -270,14 +272,14 @@ export default function Dashboard() {
       </div>
 
       {/* POPULATION PER PUROK */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mx-4 lg:mx-6">
+      <div className="rounded-xl shadow-sm border p-8 mx-4 lg:mx-6 dark:bg-neutral-900">
         <h2 className="text-xl font-semibold mb-4">Population Distribution per Purok</h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {stats.populationPerPurok.map((purok) => (
-            <div key={purok.name} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
-              <p className="text-sm text-gray-600 font-medium">Purok {purok.name}</p>
-              <p className="text-3xl font-bold mt-2">{purok.value}</p>
-              <p className="text-xs text-gray-500 mt-1">residents</p>
+            <div key={purok.name} className="border rounded-lg p-5 space-y-1 dark:bg-neutral-900">
+              <p className="text-sm text-gray-600 font-medium dark:bg-neutral-900">Purok {purok.name}</p>
+              <p className="text-3xl font-bold mt-2 dark:bg-neutral-900">{purok.value}</p>
+              <p className="text-xs text-gray-500 mt-1 dark:bg-neutral-900">residents</p>
             </div>
           ))}
         </div>
@@ -285,7 +287,7 @@ export default function Dashboard() {
 
       {/* TRANSFER OUT TRENDS */}
       {stats.transferOutByYear.length > 0 && (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mx-4 lg:mx-6">
+        <div className="rounded-lg shadow-sm border border-gray-200 p-6 mx-4 lg:mx-6 dark:bg-neutral-900">
           <h2 className="text-xl font-semibold mb-4">Transfer Out Trends by Year</h2>
           <div className="flex gap-4 overflow-x-auto pb-2">
             {stats.transferOutByYear.map((year) => (
@@ -300,29 +302,29 @@ export default function Dashboard() {
       )}
 
       {/* DETAILED PUROK STATISTICS TABLE */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mx-4 lg:mx-6">
+      <div className="bg-white rounded-lg shadow-sm border  p-6 mx-4 lg:mx-6 dark:bg-neutral-900">
         <h2 className="text-xl font-semibold mb-4">Detailed Purok Statistics</h2>
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto mt-2"> 
           <table className="w-full text-sm">
-            <thead className="bg-gray-50">
+            <thead className="bg-gray-50 dark:bg-neutral-900">
               <tr>
-                <th className="text-left px-4 py-3 font-medium text-gray-700">Purok</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-700">Population</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-700">Families</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-700">Senior Citizens</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-700">PWD</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-700">Percentage</th>
+                <th className="px-4 py-3 text-sm font-medium  dark:text-white">Purok</th>
+                <th className="px-4 py-3 text-sm font-medium  dark:text-white">Population</th>
+                <th className="px-4 py-3 text-sm font-medium  dark:text-white">Families</th>
+                <th className="px-4 py-3 text-sm font-medium  dark:text-white">Senior Citizens</th>
+                <th className="px-4 py-3 text-sm font-medium  dark:text-white">PWD</th>
+                <th className="px-4 py-3 text-sm font-medium  dark:text-white">Percentage</th>
               </tr>
             </thead>
             <tbody>
               {stats.purokDetails.map((row, index) => (
-                <tr key={row.purok} className={`border-t hover:bg-gray-50 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}`}>
-                  <td className="px-4 py-3 font-medium">{row.purok}</td>
-                  <td className="px-4 py-3">{row.population}</td>
-                  <td className="px-4 py-3">{row.families}</td>
-                  <td className="px-4 py-3">{row.seniors}</td>
-                  <td className="px-4 py-3">{row.pwd}</td>
-                  <td className="px-4 py-3">
+                <tr key={row.purok} className={`border-t dark:bg-neutral-900 hover:bg-gray-50 h-[48px] ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}`}>
+                  <td className="px-4 py-3 text-sm font-medium">{row.purok}</td>
+                  <td className="px-4 py-3 text-sm">{row.population}</td>
+                  <td className="px-4 py-3 text-sm">{row.families}</td>
+                  <td className="px-4 py-3 text-sm">{row.seniors}</td>
+                  <td className="px-4 py-3 text-sm">{row.pwd}</td>
+                  <td className="px-4 py-3 text-sm">
                     <Badge variant="outline">{row.percentage}</Badge>
                   </td>
                 </tr>
@@ -333,20 +335,20 @@ export default function Dashboard() {
       </div>
 
       {/* VULNERABLE CATEGORY BREAKDOWN TABLE */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mx-4 lg:mx-6">
+      <div className="bg-white rounded-lg shadow-sm border p-6 mx-4 lg:mx-6 dark:bg-neutral-900">
         <h2 className="text-xl font-semibold mb-4">Vulnerable Category Breakdown</h2>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-gray-50">
+            <thead className="bg-gray-50 dark:bg-neutral-900">
               <tr>
-                <th className="text-left px-4 py-3 font-medium text-gray-700">Category</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-700">Count</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-700">Percentage</th>
+                <th className="text-left px-4 py-3 font-medium text-gray-700 dark:text-white">Category</th>
+                <th className="text-left px-4 py-3 font-medium text-gray-700 dark:text-white">Count</th>
+                <th className="text-left px-4 py-3 font-medium text-gray-700 dark:text-white">Percentage</th>
               </tr>
             </thead>
             <tbody>
               {stats.vulnerableTable.map((row, index) => (
-                <tr key={row.category} className={`border-t hover:bg-gray-50 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}`}>
+                <tr key={row.category} className={`border-t hover:bg-gray-50 dark:bg-neutral-900 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}`}>
                   <td className="px-4 py-3 font-medium">{row.category}</td>
                   <td className="px-4 py-3">{row.count}</td>
                   <td className="px-4 py-3">

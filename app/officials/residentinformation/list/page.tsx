@@ -253,148 +253,92 @@ export default function ResidentsPage() {
         <tbody>
           {tableData.length === 0 ? (
             <tr>
-              {Object.values(tableColumns).map((header) => (
-                <th key={header} className="text-left font-medium text-black px-4 py-3">
-                  {header}
-                </th>
-              ))}
+              <td
+                colSpan={Object.keys(tableColumns).length}
+                className="text-center py-6 text-gray-400"
+              >
+                No records found
+              </td>
             </tr>
           ) : (
             tableData.map((row) => (
               <tr
                 key={row.residentId}
                 className={`border-t cursor-pointer transition-colors
-                  ${theme === "dark" ? "hover:bg-gray-700 text-gray-200" : "hover:bg-gray-50 text-gray-700"}
+                  ${theme === "dark"
+                    ? "hover:bg-gray-700 text-gray-200"
+                    : "hover:bg-gray-50 text-gray-700"}
                 `}
-                onClick={() => { setSelectedResident(row); setProfileSheetOpen(true) }}
-                >
+                onClick={() => {
+                  setSelectedResident(row)
+                  setProfileSheetOpen(true)
+                }}
+              >
                 {/* ID */}
-                <td className={`px-4 py-3 ${
-                    theme === "dark" ? "text-gray-100" : "text-gray-700"
-                  }`}>
-                    {row.residentId}
-                  </td>
+                <td className="px-4 py-3">{row.residentId}</td>
 
                 {/* Name + Family ID */}
-                <td className={`px-4 py-3 ${
-                  theme === "dark" ? "text-gray-100" : "text-gray-700"
-                }`}>
+                <td className="px-4 py-3">
                   <div>{row.fullName}</div>
                   {row.familyId && (
-                    <div className={theme === "dark" ? "text-gray-400 text-xs" : "text-gray-400 text-xs"}>
-                      {row.familyId}
-                    </div>
+                    <div className="text-gray-400 text-xs">{row.familyId}</div>
                   )}
                 </td>
 
                 {/* Address + Purok */}
-                <td className={`px-4 py-3 ${
-                  theme === "dark" ? "text-gray-100" : "text-gray-700"
-                }`}>
+                <td className="px-4 py-3">
                   <div>{`${row.houseNumber} ${row.street}`}</div>
-                  <div className={theme === "dark" ? "text-gray-400 text-xs" : "text-gray-400 text-xs"}>{row.purok}</div>
+                  <div className="text-gray-400 text-xs">{row.purok}</div>
                 </td>
 
                 {/* Contact */}
-                <td className={`px-4 py-3 ${
-                  theme === "dark" ? "text-gray-100" : "text-gray-700"
-                }`}>{row.contactNumber}</td>
+                <td className="px-4 py-3">{row.contactNumber}</td>
 
                 {/* Vulnerable Types */}
                 <td className="px-4 py-3">
-                  {row.vulnerableTypes && row.vulnerableTypes.length > 0
-                    ? row.vulnerableTypes.map((type: string) => (
-                        <span
-                          key={type}
-                          className="px-2 py-0.5 rounded-full text-xs bg-orange-100 text-orange-700 mr-1"
-                        >
-                          {type}
-                        </span>
-                      ))
-                    : (
-                      <span className="text-gray-400 text-xs">
-                        None
+                  {row.vulnerableTypes?.length ? (
+                    row.vulnerableTypes.map((type: string) => (
+                      <span
+                        key={type}
+                        className="px-2 py-0.5 rounded-full text-xs bg-orange-100 text-orange-700 mr-1"
+                      >
+                        {type}
                       </span>
-                    )}
+                    ))
+                  ) : (
+                    <span className="text-gray-400 text-xs">None</span>
+                  )}
                 </td>
 
                 {/* Status */}
                 <td className="px-4 py-3">
-                  <span className={`px-2 py-1 rounded-full text-xs ${
-                    row.status === 'Active' ? theme === 'dark' ? 'bg-green-700 text-green-100' : 'bg-green-100 text-green-700' :
-                    row.status === 'Inactive' ? theme === 'dark' ? 'bg-gray-700 text-gray-200' : 'bg-gray-100 text-gray-700' :
-                    row.status === 'Transferred Out' ? theme === 'dark' ? 'bg-yellow-700 text-yellow-100' : 'bg-yellow-100 text-yellow-700' :
-                    theme === 'dark' ? 'bg-red-700 text-red-100' : 'bg-red-100 text-red-700'
-                  }`}>
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs ${
+                      row.status === 'Active'
+                        ? theme === 'dark'
+                          ? 'bg-green-700 text-green-100'
+                          : 'bg-green-100 text-green-700'
+                        : row.status === 'Inactive'
+                        ? theme === 'dark'
+                          ? 'bg-gray-700 text-gray-200'
+                          : 'bg-gray-100 text-gray-700'
+                        : row.status === 'Transferred Out'
+                        ? theme === 'dark'
+                          ? 'bg-yellow-700 text-yellow-100'
+                          : 'bg-yellow-100 text-yellow-700'
+                        : theme === 'dark'
+                        ? 'bg-red-700 text-red-100'
+                        : 'bg-red-100 text-red-700'
+                    }`}
+                  >
                     {row.status}
                   </span>
-
                 </td>
               </tr>
-            ) : (
-              tableData.map((row) => (
-                <tr
-                  key={row.residentId}
-                  className="border-t hover:bg-gray-50 cursor-pointer"
-                  onClick={() => { setSelectedResident(row); setProfileSheetOpen(true) }}
-                >
-                  
-                  {/* ID */}
-                  <td className="px-4 py-3 text-gray-700">{row.residentId}</td>
+            ))
+          )}
+        </tbody>
 
-                  {/* Name + Family ID */}
-                  <td className="px-4 py-3 text-gray-700">
-                    <div>{row.fullName}</div>
-                    {row.familyId && (
-                      <div className="text-gray-400 text-xs">{row.familyId}</div>
-                    )}
-                  </td>
-
-                  {/* Address + Purok */}
-                  <td className="px-4 py-3 text-gray-700">
-                    <div>{`${row.houseNumber} ${row.street}`}</div>
-                    <div className="text-gray-400 text-xs">{row.purok}</div>
-                  </td>
-
-                  {/* Contact */}
-                  <td className="px-4 py-3 text-gray-700">{row.contactNumber}</td>
-
-                  {/* Vulnerable Types */}
-                  <td className="px-4 py-3">
-                    {row.vulnerableTypes && row.vulnerableTypes.length > 0
-                      ? row.vulnerableTypes.map((type: string) => (
-                          <span
-                            key={type}
-                            className="px-2 py-0.5 rounded-full text-xs bg-orange-100 text-orange-700 mr-1"
-                          >
-                            {type}
-                          </span>
-                        ))
-                      : (
-                          <span className="text-gray-400 text-xs">
-                            None
-                          </span>
-                        )
-                    }
-                  </td>
-
-                  {/* Status */}
-                  <td className="px-4 py-3">
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs ${
-                        row.status === 'Active' ? 'bg-green-100 text-green-700' :
-                        row.status === 'Inactive' ? 'bg-gray-100 text-gray-700' :
-                        row.status === 'Transferred Out' ? 'bg-yellow-100 text-yellow-700' :
-                        'bg-red-100 text-red-700'
-                      }`}
-                    >
-                      {row.status}
-                    </span>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
         </table>
       </div>
 

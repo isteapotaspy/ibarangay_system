@@ -8,8 +8,7 @@ import {
   ShieldAlert,
   UsersRound,
   Settings2,
-  Sun,
-  Moon,
+  File,
   GalleryVerticalEnd,
 } from "lucide-react"
 
@@ -68,7 +67,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     {
       title: "Filing",
       url: "/officials/certificate",
-      icon: ShieldAlert,
+      icon: File,
       items: [
         { title: "Certificates", url: "/officials/certificate" },
       ],

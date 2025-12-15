@@ -4,7 +4,9 @@ import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import Image from "next/image";
-import { Loader2 } from "lucide-react";
+import { Fullscreen, Loader2 } from "lucide-react";
+
+import { Shield, Users, Package, FileText, ArrowRight, Play, CheckCircle, Sparkles } from 'lucide-react';
 
 // Use the exact URL format from your working example
 const COGNITO_DOMAIN = "https://ap-southeast-2meh3b79jl.auth.ap-southeast-2.amazoncognito.com";
@@ -203,9 +205,17 @@ export default function Home() {
       )}
 
       {/* HERO SECTION */}
-      <section className="relative overflow-hidden pt-28 pb-40">
+      <section className="relative overflow-hidden pt-28 pb-60">
         {/* Background */}
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-900 via-blue-600 to-purple-700 animate-gradient-slow blur-3xl opacity-70"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-900 via-blue-600 to-purple-700 animate-gradient-slow blur-2xl opacity-100"> 
+          <Image
+              src="/barangay.jpg"
+              alt="Barangay"
+              width={800}
+              height={380}
+              className="justify center w-full h-full"
+            />
+        </div>
 
         <div className="relative text-center max-w-3xl mx-auto px-6">
           <div className="px-4 py-1 mx-auto mb-4 bg-white/10 rounded-full w-max text-xs text-blue-200">
@@ -234,9 +244,6 @@ export default function Home() {
 
         {/* FLOATING CARDS */}
         <div className="relative max-w-5xl mx-auto mt-24 px-6">
-          {/* Main dashboard preview box */}
-          <div className="bg-black/40 border border-white/10 rounded-2xl h-[380px] w-full backdrop-blur-lg shadow-xl"></div>
-
           {/* Resident Profile Card */}
           <Card className="absolute top-10 -left-6 w-48 bg-white/10 border-white/20 backdrop-blur-xl text-white shadow-lg">
             <CardContent className="p-4 text-sm">
@@ -246,11 +253,26 @@ export default function Home() {
             </CardContent>
           </Card>
 
+          {/* Notification Card */}
+          <Card className="absolute -bottom-30 right-109 w-52 bg-yellow-500/20 border-yellow-500/30 backdrop-blur-xl text-yellow-200 shadow-lg">
+            <CardContent className="p-4 text-sm">
+              <p className="font-medium">New Issue</p>
+              <p className="text-xs mt-1">Filed 1 min ago</p>
+            </CardContent>
+          </Card>
+
           {/* Certificate Request Card */}
           <Card className="absolute top-12 -right-8 w-56 bg-white/10 border-white/20 backdrop-blur-xl text-white shadow-lg">
             <CardContent className="p-4 text-sm">
               <p className="font-medium">Barangay Certificate</p>
               <p className="text-xs text-gray-300 mt-1">Request submitted</p>
+            </CardContent>
+          </Card>
+
+          <Card className="absolute bottom-10 -left-15 w-56 bg-white/10 border-white/20 backdrop-blur-xl text-white shadow-lg">
+            <CardContent className="p-4 text-sm">
+              <p className="font-medium">Barangay Certificate</p>
+              <p className="text-xs text-gray-300 mt-1">Request denied</p>
             </CardContent>
           </Card>
 
@@ -263,6 +285,143 @@ export default function Home() {
           </Card>
         </div>
       </section>
+
+      {/* Features Grid */}
+      <section className="py-20 bg-gradient-to-b from-transparent to-gray-950">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl mb-4">Everything you need</h2>
+            <p className="text-xl text-gray-400">All-in-one barangay management solution</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[
+              {
+                icon: Users,
+                title: 'Resident Management',
+                description: 'Track residents, families, and vulnerable sectors with QR codes',
+                color: 'from-blue-600 to-blue-700'
+              },
+              {
+                icon: Package,
+                title: 'Property & Inventory',
+                description: 'Manage equipment, borrowing, and maintenance records',
+                color: 'from-green-600 to-green-700'
+              },
+              {
+                icon: Shield,
+                title: 'Peace & Order',
+                description: 'Handle incidents, violations, and mediation cases',
+                color: 'from-orange-600 to-orange-700'
+              },
+              {
+                icon: FileText,
+                title: 'Certificate System',
+                description: 'Generate official documents and clearances instantly',
+                color: 'from-purple-600 to-purple-700'
+              },
+              {
+                icon: CheckCircle,
+                title: 'Real-time Analytics',
+                description: 'Track metrics and generate insightful reports',
+                color: 'from-pink-600 to-pink-700'
+              },
+              {
+                icon: Sparkles,
+                title: 'Modern Interface',
+                description: 'Clean, intuitive design for efficient operations',
+                color: 'from-indigo-600 to-indigo-700'
+              },
+            ].map((feature, index) => {
+              const Icon = feature.icon;
+              return (
+                <div key={index} className="bg-gray-900 border border-gray-800 rounded-2xl p-8 hover:border-gray-700 transition-colors group">
+                  <div className={`w-12 h-12 bg-gradient-to-br ${feature.color} rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
+                    <Icon className="w-6 h-6" />
+                  </div>
+                  <h3 className="text-xl mb-2">{feature.title}</h3>
+                  <p className="text-gray-400">{feature.description}</p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Stats Section */}
+      <section className="py-20 border-t border-gray-900">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
+            <div>
+              <p className="text-5xl md:text-6xl mb-3 bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">10K+</p>
+              <p className="text-gray-400">Residents Managed</p>
+            </div>
+            <div>
+              <p className="text-5xl md:text-6xl mb-3 bg-gradient-to-r from-green-400 to-green-600 bg-clip-text text-transparent">5K+</p>
+              <p className="text-gray-400">Certificates Issued</p>
+            </div>
+            <div>
+              <p className="text-5xl md:text-6xl mb-3 bg-gradient-to-r from-purple-400 to-purple-600 bg-clip-text text-transparent">99.9%</p>
+              <p className="text-gray-400">Uptime</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="border-t border-gray-900 py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
+            <div>
+              <h4 className="mb-4 text-sm text-gray-400">Product</h4>
+              <ul className="space-y-2 text-sm">
+                <li><a href="#" className="text-gray-500 hover:text-white transition-colors">Features</a></li>
+                <li><a href="#" className="text-gray-500 hover:text-white transition-colors">Modules</a></li>
+                <li><a href="#" className="text-gray-500 hover:text-white transition-colors">Pricing</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="mb-4 text-sm text-gray-400">Resources</h4>
+              <ul className="space-y-2 text-sm">
+                <li><a href="#" className="text-gray-500 hover:text-white transition-colors">Documentation</a></li>
+                <li><a href="#" className="text-gray-500 hover:text-white transition-colors">Guides</a></li>
+                <li><a href="#" className="text-gray-500 hover:text-white transition-colors">Support</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="mb-4 text-sm text-gray-400">Company</h4>
+              <ul className="space-y-2 text-sm">
+                <li><a href="#" className="text-gray-500 hover:text-white transition-colors">About</a></li>
+                <li><a href="#" className="text-gray-500 hover:text-white transition-colors">Contact</a></li>
+                <li><a href="#" className="text-gray-500 hover:text-white transition-colors">Careers</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="mb-4 text-sm text-gray-400">Legal</h4>
+              <ul className="space-y-2 text-sm">
+                <li><a href="#" className="text-gray-500 hover:text-white transition-colors">Privacy</a></li>
+                <li><a href="#" className="text-gray-500 hover:text-white transition-colors">Terms</a></li>
+                <li><a href="#" className="text-gray-500 hover:text-white transition-colors">Security</a></li>
+              </ul>
+            </div>
+          </div>
+          <div className="border-t border-gray-900 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-2">
+              <div className="w-15 h-15 bg-transparent rounded-lg flex items-center justify-center">
+                  <Image
+                src="/logob.png"
+                alt="Logo"
+                width={100}
+                height={100}
+                className="object-contain"
+              />
+              </div>
+              <span className="text-gray-400">iBarangay</span>
+            </div>
+            <p className="text-sm text-gray-500">&copy; 2025 iBarangay. All rights reserved.</p>
+          </div>
+        </div>
+      </footer>
     </main>
   );
 }
